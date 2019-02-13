@@ -126,7 +126,7 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             for (i in 1 until Node.B) {
                 append(", ")
                 // Tがnullableのとき意味のあるnullが入りうるのでブレークしない
-                append(nodes!![i])
+                append(leaves!![i])
             }
         }
     }
