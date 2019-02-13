@@ -16,9 +16,10 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
         val level = level
         return if (size == 1 shl (level + Node.WIDTH)) {
             // 全ノードが埋まっている場合
-            val nodes = arrayOfNulls<Node<T>>(Node.B)
-            nodes[0] = root
-            nodes[1] = Node.createSingle(level, e)
+            val nodes = arrayOfNulls<Node<T>>(Node.B).also {
+                it[0] = root
+                it[1] = Node.createSingle(level, e)
+            }
             TreeList(Node(nodes, null), level + Node.WIDTH, size + 1)
         } else {
             TreeList(root.added(this.level, size, e), level, size + 1)
