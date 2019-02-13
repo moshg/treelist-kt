@@ -61,7 +61,7 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
         return -1
     }
 
-    override fun iterator(): ListIter<T> = ListIter(this, 0)
+    override fun iterator(): Iter<T> = Iter(root, level, size, 0, null)
 
     override fun listIterator(): ListIter<T> = ListIter(this, 0)
 
@@ -69,6 +69,34 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
 
     override fun subList(fromIndex: Int, toIndex: Int): List<T> {
         TODO("not implemented")
+    }
+
+    class Iter<T> internal constructor(
+        private val root: Node<T>,
+        private val level: Int,
+        private val size: Int,
+        private var index: Int,
+        private var leaves: Array<Any?>?
+    ) : Iterator<T> {
+        override fun hasNext(): Boolean = index < size
+
+        override fun next(): T {
+            if (index >= size) {
+                throw NoSuchElementException("Index $index out of bounds for size $size")
+            }
+
+            if (index and Node.MASK == 0) {
+                leaves = root.getLeaves(level, index)
+                index += 1
+                @Suppress("UNCHECKED_CAST")
+                return leaves!![0] as T
+            } else {
+                val e = leaves!![index]
+                index += 1
+                @Suppress("UNCHECKED_CAST")
+                return e as T
+            }
+        }
     }
 
     class ListIter<T> internal constructor(private val list: TreeList<T>, private var index: Int) : ListIterator<T> {

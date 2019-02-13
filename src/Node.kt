@@ -3,6 +3,9 @@ internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?)
     inline fun get(level: Int, index: Int): T = get(this, level, index)
 
     @Suppress("NOTHING_TO_INLINE")
+    inline fun getLeaves(level: Int, index: Int): Array<Any?> = getLeaves(this, level, index)
+
+    @Suppress("NOTHING_TO_INLINE")
     inline fun added(level: Int, index: Int, e: T): Node<T> = added(this, level, index, e)
 
     companion object {
@@ -32,6 +35,15 @@ internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?)
                 node.leaves!![index and MASK] as T
             } else {
                 get(node.children!![(index ushr level) and MASK]!!, level - WIDTH, index)
+            }
+        }
+
+        @JvmStatic
+        tailrec fun <T> getLeaves(node: Node<T>, level: Int, index: Int): Array<Any?> {
+            return if (level == 0) {
+                node.leaves!!
+            } else {
+                getLeaves(node.children!![(index ushr level) and MASK]!!, level - WIDTH, index)
             }
         }
 
