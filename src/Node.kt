@@ -111,11 +111,11 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             append("Nodes(")
             append(nodes!![0])
             for (i in 1 until Node.B) {
-                append(", ")
                 val child = nodes!![i]
                 if (child === null) {
                     break
                 } else {
+                    append(", ")
                     append(child)
                 }
             }
@@ -128,6 +128,7 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
                 // Tがnullableのとき意味のあるnullが入りうるのでブレークしない
                 append(leaves!![i])
             }
+            append(')')
         }
     }
 }

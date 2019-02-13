@@ -30,4 +30,14 @@ internal class NodeTest {
         assertEquals(null, child.nodes)
         assertEquals(2, child.leaves!![0])
     }
+
+    @Test
+    fun added() {
+        val node = Node<Int>(null, Array(Node.B) {it})
+        val nodes = arrayOfNulls<Node<Int>?>(Node.B)
+        nodes[0] = node
+        val root = Node(nodes, null)
+        root.added(Node.WIDTH, Node.B, 100)
+        assertEquals(100, root.get(Node.WIDTH, Node.B))
+    }
 }
