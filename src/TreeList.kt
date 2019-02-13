@@ -42,21 +42,24 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
     }
 
     override fun indexOf(element: T): Int {
-        val level = level
-        for (i in 0 until size) {
-            if (element == this.root.get(level, i)) {
-                return i
+        var index = 0
+        for (e in this) {
+            if (element == e) {
+                return index
             }
+            index += 1
         }
         return -1
     }
 
     override fun lastIndexOf(element: T): Int {
-        val level = level
-        for (i in (size - 1) downTo 0) {
-            if (element == this.root.get(level, i)) {
-                return i
+        var index = size - 1
+        val iter = listIterator(size - 1)
+        while (iter.hasPrevious()) {
+            if (element == iter.previous()) {
+                return index
             }
+            index -= 1
         }
         return -1
     }
@@ -65,7 +68,12 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
 
     override fun listIterator(): ListIter<T> = ListIter(root, level, size, 0, null)
 
-    override fun listIterator(index: Int): ListIter<T> = ListIter(root, level, size, index, null)
+    override fun listIterator(index: Int): ListIter<T> {
+        if (index < 0 || index >= size) {
+            throw IndexOutOfBoundsException(index)
+        }
+        return ListIter(root, level, size, index, null)
+    }
 
     override fun subList(fromIndex: Int, toIndex: Int): List<T> {
         TODO("not implemented")
