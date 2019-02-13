@@ -1,31 +1,18 @@
-class TreeList<T> private constructor(private val root: Node<T>, private val level: Int, override val size: Int) :
-    List<T> {
+class SubTreeList<T> internal constructor(
+    private val root: Node<T>, private val level: Int, val start: Int, val end: Int
+) : List<T> {
+    override val size: Int
+        get() = end - start
+
     override operator fun get(index: Int): T {
-        if (index < 0 || index >= size) {
+        val i = index + start
+        if (index < 0 || i >= start) {
             throw IndexOutOfBoundsException(index)
         }
-        return root.get(level, index)
+        return root.get(level, i)
     }
 
-    fun added(e: T): TreeList<T> {
-        val size = size
-        if (size == Int.MAX_VALUE) {
-            throw IllegalStateException("Size exceeds the max value of integer")
-        }
-
-        val level = level
-        return if (size == 1 shl (level + Node.WIDTH)) {
-            // 全ノードが埋まっている場合
-            val nodes = arrayOfNulls<Node<T>>(Node.B)
-            nodes[0] = root
-            nodes[1] = Node.createSingle(level, e)
-            TreeList(Node(nodes, null), level + Node.WIDTH, size + 1)
-        } else {
-            TreeList(root.added(this.level, size, e), level, size + 1)
-        }
-    }
-
-    override fun isEmpty(): Boolean = size == 0
+    override fun isEmpty(): Boolean = start == end
 
     override fun contains(element: T): Boolean {
         for (e in this) {
@@ -37,15 +24,15 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
     }
 
     override fun containsAll(elements: Collection<T>): Boolean {
-        val set = this.toHashSet()
+        val set = this.toSet()
         return set.containsAll(elements)
     }
 
     override fun indexOf(element: T): Int {
-        var index = 0
+        var index = start
         for (e in this) {
             if (element == e) {
-                return index
+                return index - start
             }
             index += 1
         }
@@ -53,29 +40,29 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
     }
 
     override fun lastIndexOf(element: T): Int {
-        var index = size - 1
+        var index = end - 1
         val iter = listIterator(size - 1)
         while (iter.hasPrevious()) {
             if (element == iter.previous()) {
-                return index
+                return index - start
             }
             index -= 1
         }
         return -1
     }
 
-    override fun iterator(): Iter<T> = Iter(root, level, size, 0, null)
+    override fun iterator(): Iter<T> = Iter(root, level, start, end, 0, null)
 
-    override fun listIterator(): ListIter<T> = ListIter(root, level, size, 0, null)
+    override fun listIterator(): ListIter<T> = ListIter(root, level, start, end, 0, null)
 
     override fun listIterator(index: Int): ListIter<T> {
         if (index < 0 || index >= size) {
             throw IndexOutOfBoundsException(index)
         }
-        return ListIter(root, level, size, index, null)
+        return ListIter(root, level, start, end, index, null)
     }
 
-    override fun subList(fromIndex: Int, toIndex: Int): List<T> {
+    override fun subList(fromIndex: Int, toIndex: Int): SubTreeList<T> {
         if (fromIndex > toIndex) {
             throw IllegalArgumentException("fromIndex $fromIndex greater than toIndex $toIndex")
         } else if (fromIndex < 0) {
@@ -83,21 +70,22 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
         } else if (toIndex > size) {
             throw IndexOutOfBoundsException("toIndex $toIndex out of bounds for size $size")
         }
-        return SubTreeList(root, level, fromIndex, toIndex)
+        return SubTreeList(root, level, fromIndex + start, toIndex + start)
     }
 
     class Iter<T> internal constructor(
         private val root: Node<T>,
         private val level: Int,
-        private val size: Int,
+        private val start: Int,
+        private val end: Int,
         private var index: Int,
         private var leaves: Array<Any?>?
     ) : Iterator<T> {
-        override fun hasNext(): Boolean = index < size
+        override fun hasNext(): Boolean = index < end
 
         override fun next(): T {
-            if (index >= size) {
-                throw NoSuchElementException("Index $index out of bounds for size $size")
+            if (index >= end) {
+                throw NoSuchElementException("Index ${index - start} out of bounds for size ${end - start}")
             }
 
             if (index and Node.MASK == 0) {
@@ -117,15 +105,16 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
     class ListIter<T> internal constructor(
         private val root: Node<T>,
         private val level: Int,
-        private val size: Int,
+        private val start: Int,
+        private val end: Int,
         private var index: Int,
         private var leaves: Array<Any?>?
     ) : ListIterator<T> {
-        override fun hasNext(): Boolean = index < size
+        override fun hasNext(): Boolean = index < end
 
         override fun next(): T {
-            if (index >= size) {
-                throw NoSuchElementException("Index $index out of bounds for size $size")
+            if (index >= end) {
+                throw NoSuchElementException("Index ${index - start} out of bounds for size ${end - start}")
             }
 
             if (index and Node.MASK == 0) {
@@ -146,8 +135,8 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
         override fun hasPrevious(): Boolean = index > 0
 
         override fun previous(): T {
-            if (index <= 0) {
-                throw NoSuchElementException("Index $index out of bounds")
+            if (index <= start) {
+                throw NoSuchElementException("Index ${index - start} out of bounds")
             }
 
             index -= 1
