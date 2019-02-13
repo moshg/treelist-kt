@@ -8,6 +8,10 @@ class TreeList<T> private constructor(private val size: Int, private val level: 
 
     fun added(e: T): TreeList<T> {
         val size = size
+        if (size == Int.MAX_VALUE) {
+            throw IllegalStateException("Size exceeds the max value of integer")
+        }
+
         val level = level
         if (size == 1 shl (level + Node.WIDTH)) {
             // 全ノードが埋まっている場合
