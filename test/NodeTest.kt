@@ -18,4 +18,16 @@ internal class NodeTest {
         assertEquals(2, root.get(Node.WIDTH, Node.B + 1))
         assertEquals(leaves, root.getLeaves(Node.WIDTH, Node.B + 1))
     }
+
+    @Test
+    fun createSingle() {
+        val node = Node.createSingle(Node.WIDTH, 2)
+        assertEquals(null, node.leaves)
+        val child = node.nodes!![0]!!
+        for (i in 1 until Node.B) {
+            assertEquals(null, node.nodes!![i])
+        }
+        assertEquals(null, child.nodes)
+        assertEquals(2, child.leaves!![0])
+    }
 }
