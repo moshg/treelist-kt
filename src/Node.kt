@@ -1,3 +1,4 @@
+@Suppress("NAME_SHADOWING")
 internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?) {
     @Suppress("NOTHING_TO_INLINE")
     inline fun get(level: Int, index: Int): T = get(this, level, index)
