@@ -25,6 +25,15 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
         }
     }
 
+    fun set(index: Int, e: T): TreeList<T> {
+        if (index < 0) {
+            throw IndexOutOfBoundsException(index)
+        } else if (index >= size) {
+            throw IndexOutOfBoundsException("Index $index out of bounds for size $size")
+        }
+        return TreeList(root.set(level, index, e), level, size)
+    }
+
     override fun isEmpty(): Boolean = size == 0
 
     override fun contains(element: T): Boolean {
