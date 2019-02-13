@@ -51,15 +51,25 @@ class SubTreeList<T> internal constructor(
         return -1
     }
 
-    override fun iterator(): Iter<T> = Iter(root, level, start, end, 0, null)
+    override fun iterator(): Iter<T> = Iter(root, level, start, end, start, null)
 
-    override fun listIterator(): ListIter<T> = ListIter(root, level, start, end, 0, null)
+    override fun listIterator(): ListIter<T> = ListIter(root, level, start, end, start, null)
 
     override fun listIterator(index: Int): ListIter<T> {
-        if (index < 0 || index >= size) {
+        if (index < 0 || index > size) {
             throw IndexOutOfBoundsException(index)
         }
-        return ListIter(root, level, start, end, index, null)
+
+        val root = root
+        return if (root === null) {
+            ListIter(root, level, start, end, index, null)
+        } else {
+            if (index == size) {
+                ListIter(root, level, start, end, start + index, root.getLeaves(level, start + index - 1))
+            } else {
+                ListIter(root, level, start, end, start + index, root.getLeaves(level, start + index))
+            }
+        }
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): SubTreeList<T> {
@@ -88,13 +98,14 @@ class SubTreeList<T> internal constructor(
                 throw NoSuchElementException("Index ${index - start} out of bounds for size ${end - start}")
             }
 
-            if (index and Node.MASK == 0) {
+            val masked = index and Node.MASK
+            if (masked == 0) {
                 leaves = root!!.getLeaves(level, index)
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![0] as T
             } else {
-                val e = leaves!![index]
+                val e = leaves!![masked]
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return e as T
@@ -117,13 +128,14 @@ class SubTreeList<T> internal constructor(
                 throw NoSuchElementException("Index ${index - start} out of bounds for size ${end - start}")
             }
 
-            if (index and Node.MASK == 0) {
+            val masked = index and Node.MASK
+            if (masked == 0) {
                 leaves = root!!.getLeaves(level, index)
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![0] as T
             } else {
-                val e = leaves!![index]
+                val e = leaves!![masked]
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return e as T
@@ -136,18 +148,18 @@ class SubTreeList<T> internal constructor(
 
         override fun previous(): T {
             if (index <= start) {
-                throw NoSuchElementException("Index ${index - start} out of bounds")
+                throw NoSuchElementException("Index ${index - start - 1} out of bounds")
             }
 
             index -= 1
-
-            if (index and Node.MASK == Node.MASK) {
+            val masked = index and Node.MASK
+            if (masked == Node.MASK) {
                 leaves = root!!.getLeaves(level, index)
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![Node.MASK] as T
             } else {
                 @Suppress("UNCHECKED_CAST")
-                return leaves!![index] as T
+                return leaves!![masked] as T
             }
         }
 
