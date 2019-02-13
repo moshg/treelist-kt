@@ -1,10 +1,10 @@
-class TreeList<T> private constructor(override val size: Int, private val level: Int, private val root: Node<T>) :
+class TreeList<T> private constructor(private val root: Node<T>, private val level: Int, override val size: Int) :
     List<T> {
     override operator fun get(index: Int): T {
         if (index < 0 || index >= size) {
             throw IndexOutOfBoundsException(index)
         }
-        return root.get(index, level)
+        return root.get(level, index)
     }
 
     fun added(e: T): TreeList<T> {
@@ -19,9 +19,9 @@ class TreeList<T> private constructor(override val size: Int, private val level:
             val nodes = arrayOfNulls<Node<T>>(Node.B)
             nodes[0] = root
             nodes[1] = Node.createSingle(level, e)
-            TreeList(size + 1, level + Node.WIDTH, Node(nodes, null))
+            TreeList(Node(nodes, null), level + Node.WIDTH, size + 1)
         } else {
-            TreeList(size + 1, level, root.added(size, this.level, e))
+            TreeList(root.added(this.level, size, e), level, size + 1)
         }
     }
 
@@ -44,7 +44,7 @@ class TreeList<T> private constructor(override val size: Int, private val level:
     override fun indexOf(element: T): Int {
         val level = level
         for (i in 0 until size) {
-            if (element == this.root.get(i, level)) {
+            if (element == this.root.get(level, i)) {
                 return i
             }
         }
@@ -54,7 +54,7 @@ class TreeList<T> private constructor(override val size: Int, private val level:
     override fun lastIndexOf(element: T): Int {
         val level = level
         for (i in (size - 1) downTo 0) {
-            if (element == this.root.get(i, level)) {
+            if (element == this.root.get(level, i)) {
                 return i
             }
         }
@@ -81,7 +81,7 @@ class TreeList<T> private constructor(override val size: Int, private val level:
                 throw NoSuchElementException("Index $index out of bounds for size ${list.size}")
             }
 
-            val e = list.root.get(index, list.level)
+            val e = list.root.get(list.level, index)
             index += 1
             return e
         }
@@ -94,7 +94,7 @@ class TreeList<T> private constructor(override val size: Int, private val level:
             }
 
             index -= 1
-            return list.root.get(index, list.level)
+            return list.root.get(list.level, index)
         }
 
         override fun previousIndex(): Int = index - 1

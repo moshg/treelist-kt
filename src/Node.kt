@@ -1,9 +1,9 @@
 internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?) {
     @Suppress("NOTHING_TO_INLINE")
-    inline fun get(index: Int, level: Int): T = get(this, index, level)
+    inline fun get(level: Int, index: Int): T = get(this, level, index)
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun added(index: Int, level: Int, e: T): Node<T> = added(this, index, level, e)
+    inline fun added(level: Int, index: Int, e: T): Node<T> = added(this, level, index, e)
 
     companion object {
         const val B: Int = 32
@@ -26,17 +26,17 @@ internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?)
         }
 
         @JvmStatic
-        tailrec fun <T> get(node: Node<T>, index: Int, level: Int): T {
+        tailrec fun <T> get(node: Node<T>, level: Int, index: Int): T {
             return if (level == 0) {
                 @Suppress("UNCHECKED_CAST")
                 node.leaves!![index and MASK] as T
             } else {
-                get(node.children!![(index ushr level) and MASK]!!, index, level - WIDTH)
+                get(node.children!![(index ushr level) and MASK]!!, level - WIDTH, index)
             }
         }
 
         @JvmStatic
-        fun <T> added(node: Node<T>, index: Int, level: Int, e: T): Node<T> {
+        fun <T> added(node: Node<T>, level: Int, index: Int, e: T): Node<T> {
             var level = level
             val newNode = Node<T>(null, null)
             // 現在初期化しているノード
