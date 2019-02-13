@@ -105,4 +105,29 @@ internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?)
             return newNode
         }
     }
+
+    override fun toString(): String = buildString(B * 3) {
+        if (leaves === null) {
+            append("Nodes(")
+            append(children!![0])
+            for (i in 1 until Node.B) {
+                append(", ")
+                val child = children!![i]
+                if (child === null) {
+                    break
+                } else {
+                    append(child)
+                }
+            }
+            append(')')
+        } else {
+            append("Leaves(")
+            append(leaves!![0])
+            for (i in 1 until Node.B) {
+                append(", ")
+                // Tがnullableのとき意味のあるnullが入りうるのでブレークしない
+                append(children!![i])
+            }
+        }
+    }
 }
