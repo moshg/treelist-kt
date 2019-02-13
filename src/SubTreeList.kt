@@ -1,5 +1,5 @@
 class SubTreeList<T> internal constructor(
-    private val root: Node<T>, private val level: Int, val start: Int, val end: Int
+    private val root: Node<T>?, private val level: Int, val start: Int, val end: Int
 ) : List<T> {
     override val size: Int
         get() = end - start
@@ -9,7 +9,7 @@ class SubTreeList<T> internal constructor(
         if (index < 0 || i >= start) {
             throw IndexOutOfBoundsException(index)
         }
-        return root.get(level, i)
+        return root!!.get(level, i)
     }
 
     override fun isEmpty(): Boolean = start == end
@@ -74,7 +74,7 @@ class SubTreeList<T> internal constructor(
     }
 
     class Iter<T> internal constructor(
-        private val root: Node<T>,
+        private val root: Node<T>?,
         private val level: Int,
         private val start: Int,
         private val end: Int,
@@ -89,7 +89,7 @@ class SubTreeList<T> internal constructor(
             }
 
             if (index and Node.MASK == 0) {
-                leaves = root.getLeaves(level, index)
+                leaves = root!!.getLeaves(level, index)
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![0] as T
@@ -103,7 +103,7 @@ class SubTreeList<T> internal constructor(
     }
 
     class ListIter<T> internal constructor(
-        private val root: Node<T>,
+        private val root: Node<T>?,
         private val level: Int,
         private val start: Int,
         private val end: Int,
@@ -118,7 +118,7 @@ class SubTreeList<T> internal constructor(
             }
 
             if (index and Node.MASK == 0) {
-                leaves = root.getLeaves(level, index)
+                leaves = root!!.getLeaves(level, index)
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![0] as T
@@ -142,7 +142,7 @@ class SubTreeList<T> internal constructor(
             index -= 1
 
             if (index and Node.MASK == Node.MASK) {
-                leaves = root.getLeaves(level, index)
+                leaves = root!!.getLeaves(level, index)
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![Node.MASK] as T
             } else {

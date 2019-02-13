@@ -1,10 +1,12 @@
-class TreeList<T> private constructor(private val root: Node<T>, private val level: Int, override val size: Int) :
+class TreeList<T> private constructor(private var root: Node<T>?, private val level: Int, override val size: Int) :
     List<T> {
+    constructor() : this(null, -Node.WIDTH, 0)
+
     override operator fun get(index: Int): T {
         if (index < 0 || index >= size) {
             throw IndexOutOfBoundsException(index)
         }
-        return root.get(level, index)
+        return root!!.get(level, index)
     }
 
     fun added(e: T): TreeList<T> {
@@ -15,14 +17,19 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
 
         val level = level
         return if (size == 1 shl (level + Node.WIDTH)) {
-            // 全ノードが埋まっている場合
+            // 全ノードが埋まっていて root != null の場合
             val nodes = arrayOfNulls<Node<T>>(Node.B).also {
                 it[0] = root
                 it[1] = Node.createSingle(level, e)
             }
             TreeList(Node(nodes, null), level + Node.WIDTH, size + 1)
         } else {
-            TreeList(root.added(this.level, size, e), level, size + 1)
+            val root = root
+            if (root == null) {
+                TreeList(Node.createSingle(0, e), 0, 1)
+            } else {
+                TreeList(root.added(this.level, size, e), level, size + 1)
+            }
         }
     }
 
@@ -32,7 +39,7 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
         } else if (index >= size) {
             throw IndexOutOfBoundsException("Index $index out of bounds for size $size")
         }
-        return TreeList(root.set(level, index, e), level, size)
+        return TreeList(root!!.set(level, index, e), level, size)
     }
 
     override fun isEmpty(): Boolean = size == 0
@@ -97,7 +104,7 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
     }
 
     class Iter<T> internal constructor(
-        private val root: Node<T>,
+        private val root: Node<T>?,
         private val level: Int,
         private val size: Int,
         private var index: Int,
@@ -111,7 +118,7 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
             }
 
             if (index and Node.MASK == 0) {
-                leaves = root.getLeaves(level, index)
+                leaves = root!!.getLeaves(level, index)
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![0] as T
@@ -125,7 +132,7 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
     }
 
     class ListIter<T> internal constructor(
-        private val root: Node<T>,
+        private val root: Node<T>?,
         private val level: Int,
         private val size: Int,
         private var index: Int,
@@ -139,7 +146,7 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
             }
 
             if (index and Node.MASK == 0) {
-                leaves = root.getLeaves(level, index)
+                leaves = root!!.getLeaves(level, index)
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![0] as T
@@ -163,7 +170,7 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
             index -= 1
 
             if (index and Node.MASK == Node.MASK) {
-                leaves = root.getLeaves(level, index)
+                leaves = root!!.getLeaves(level, index)
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![Node.MASK] as T
             } else {
