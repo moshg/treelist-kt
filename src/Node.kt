@@ -54,55 +54,69 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
         @JvmStatic
         fun <T> added(node: Node<T>, level: Int, index: Int, e: T): Node<T> {
             var level = level
-            val newNode = Node<T>(null, null)
+            val retNode = Node<T>(null, null)
             // 現在初期化しているノード
-            var currNode = newNode
+            var currNewNode = retNode
+            // 現在コピーしているノード
+            var currNode = node
 
             while (level > 0) {
-                val newChildren = node.nodes!!.copyOf()
+                val currNewNodes = currNode.nodes!!.copyOf()
                 val arrIndex = (index ushr level) and MASK
-                val child = newChildren[arrIndex]
+                val child = currNewNodes[arrIndex]
                 if (child === null) {
-                    newChildren[arrIndex] = createSingle(level - WIDTH, e)
-                    currNode.nodes = newChildren
+                    currNewNodes[arrIndex] = createSingle(level - WIDTH, e)
+                    currNewNode.nodes = currNewNodes
                     break
                 } else {
-                    currNode.nodes = newChildren
+                    // nextNewNodeをcurrNewNodeのChildrenに追加し, currNewNodeをnextNewNodeに差し替える.
+                    val nextNewNode = Node<T>(null, null)
+                    currNewNodes[arrIndex] = nextNewNode
+                    currNewNode.nodes = currNewNodes
+                    currNewNode = nextNewNode
+
                     currNode = child
                 }
                 level -= WIDTH
             }
 
             if (level == 0) {
-                val newLeaves = arrayOfNulls<Any?>(WIDTH)
+                val newLeaves = currNode.leaves!!.copyOf()
                 newLeaves[index and MASK] = e
-                currNode.leaves = newLeaves
+                currNewNode.leaves = newLeaves
             }
 
-            return newNode
+            return retNode
         }
 
         @JvmStatic
         fun <T> set(node: Node<T>, level: Int, index: Int, e: T): Node<T> {
             var level = level
-            val newNode = Node<T>(null, null)
+            val retNode = Node<T>(null, null)
             // 現在初期化しているノード
-            var currNode = newNode
+            var currNewNode = retNode
+            // 現在コピーしているノード
+            var currNode = node
 
             while (level > 0) {
-                val newChildren = node.nodes!!.copyOf()
+                val currNewNodes = currNode.nodes!!.copyOf()
                 val arrIndex = (index ushr level) and MASK
-                val child = newChildren[arrIndex]
-                currNode.nodes = newChildren
+                val child = currNewNodes[arrIndex]
+                // nextNewNodeをcurrNewNodeのChildrenに追加し, currNewNodeをnextNewNodeに差し替える.
+                val nextNewNode = Node<T>(null, null)
+                currNewNodes[arrIndex] = nextNewNode
+                currNewNode.nodes = currNewNodes
+                currNewNode = nextNewNode
+
                 currNode = child!!
                 level -= WIDTH
             }
 
-            val newLeaves = arrayOfNulls<Any?>(WIDTH)
+            val newLeaves = currNode.leaves!!.copyOf()
             newLeaves[index and MASK] = e
-            currNode.leaves = newLeaves
+            currNewNode.leaves = newLeaves
 
-            return newNode
+            return retNode
         }
     }
 
