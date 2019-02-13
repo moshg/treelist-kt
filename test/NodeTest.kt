@@ -33,11 +33,16 @@ internal class NodeTest {
 
     @Test
     fun added() {
-        val node = Node<Int>(null, Array(Node.B) {it})
+        var node = Node<Int>(null, arrayOfNulls(Node.B))
+        node = node.added(0, 0, 1)
+        node = node.added(0, 1, 2)
+        assertEquals(1, node.get(0, 0))
+        assertEquals(2, node.get(0, 1))
+
         val nodes = arrayOfNulls<Node<Int>?>(Node.B)
         nodes[0] = node
-        val root = Node(nodes, null)
-        root.added(Node.WIDTH, Node.B, 100)
-        assertEquals(100, root.get(Node.WIDTH, Node.B))
+        node = Node(nodes, null)
+        node = node.added(Node.WIDTH, Node.B, 100)
+        assertEquals(100, node.get(Node.WIDTH, Node.B))
     }
 }
