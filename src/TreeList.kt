@@ -1,4 +1,4 @@
-class TreeList<T> private constructor(private var root: Node<T>?, private val level: Int, override val size: Int) :
+class TreeList<T> internal constructor(private var root: Node<T>?, private val level: Int, override val size: Int) :
     List<T> {
     constructor() : this(null, -Node.WIDTH, 0)
 
@@ -71,7 +71,7 @@ class TreeList<T> private constructor(private var root: Node<T>?, private val le
 
     override fun lastIndexOf(element: T): Int {
         var index = size - 1
-        val iter = listIterator(size - 1)
+        val iter = listIterator(size)
         while (iter.hasPrevious()) {
             if (element == iter.previous()) {
                 return index
@@ -86,10 +86,20 @@ class TreeList<T> private constructor(private var root: Node<T>?, private val le
     override fun listIterator(): ListIter<T> = ListIter(root, level, size, 0, null)
 
     override fun listIterator(index: Int): ListIter<T> {
-        if (index < 0 || index >= size) {
+        if (index < 0 || index > size) {
             throw IndexOutOfBoundsException(index)
         }
-        return ListIter(root, level, size, index, null)
+
+        val root = root
+        return if (root === null) {
+            ListIter(root, level, size, index, null)
+        } else {
+            if (index == size) {
+                ListIter(root, level, size, index, root.getLeaves(level, index - 1))
+            } else {
+                ListIter(root, level, size, index, root.getLeaves(level, index))
+            }
+        }
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): List<T> {
@@ -117,13 +127,14 @@ class TreeList<T> private constructor(private var root: Node<T>?, private val le
                 throw NoSuchElementException("Index $index out of bounds for size $size")
             }
 
-            if (index and Node.MASK == 0) {
+            val masked = index and Node.MASK
+            if (masked == 0) {
                 leaves = root!!.getLeaves(level, index)
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![0] as T
             } else {
-                val e = leaves!![index]
+                val e = leaves!![masked]
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return e as T
@@ -145,13 +156,14 @@ class TreeList<T> private constructor(private var root: Node<T>?, private val le
                 throw NoSuchElementException("Index $index out of bounds for size $size")
             }
 
-            if (index and Node.MASK == 0) {
+            val masked = index and Node.MASK
+            if (masked == 0) {
                 leaves = root!!.getLeaves(level, index)
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![0] as T
             } else {
-                val e = leaves!![index]
+                val e = leaves!![masked]
                 index += 1
                 @Suppress("UNCHECKED_CAST")
                 return e as T
@@ -168,14 +180,14 @@ class TreeList<T> private constructor(private var root: Node<T>?, private val le
             }
 
             index -= 1
-
-            if (index and Node.MASK == Node.MASK) {
+            val masked = index and Node.MASK
+            if (masked == Node.MASK) {
                 leaves = root!!.getLeaves(level, index)
                 @Suppress("UNCHECKED_CAST")
                 return leaves!![Node.MASK] as T
             } else {
                 @Suppress("UNCHECKED_CAST")
-                return leaves!![index] as T
+                return leaves!![masked] as T
             }
         }
 
