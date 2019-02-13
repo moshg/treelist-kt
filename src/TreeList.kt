@@ -63,9 +63,9 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
 
     override fun iterator(): Iter<T> = Iter(root, level, size, 0, null)
 
-    override fun listIterator(): ListIter<T> = ListIter(this, 0)
+    override fun listIterator(): ListIter<T> = ListIter(root, level, size, 0, null)
 
-    override fun listIterator(index: Int): ListIter<T> = ListIter(this, index)
+    override fun listIterator(index: Int): ListIter<T> = ListIter(root, level, size, index, null)
 
     override fun subList(fromIndex: Int, toIndex: Int): List<T> {
         TODO("not implemented")
@@ -99,22 +99,36 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
         }
     }
 
-    class ListIter<T> internal constructor(private val list: TreeList<T>, private var index: Int) : ListIterator<T> {
-        override fun hasNext(): Boolean = index < list.size
-
-        override fun hasPrevious(): Boolean = index >= 1
+    class ListIter<T> internal constructor(
+        private val root: Node<T>,
+        private val level: Int,
+        private val size: Int,
+        private var index: Int,
+        private var leaves: Array<Any?>?
+    ) : ListIterator<T> {
+        override fun hasNext(): Boolean = index < size
 
         override fun next(): T {
-            if (index >= list.size) {
-                throw NoSuchElementException("Index $index out of bounds for size ${list.size}")
+            if (index >= size) {
+                throw NoSuchElementException("Index $index out of bounds for size $size")
             }
 
-            val e = list.root.get(list.level, index)
-            index += 1
-            return e
+            if (index and Node.MASK == 0) {
+                leaves = root.getLeaves(level, index)
+                index += 1
+                @Suppress("UNCHECKED_CAST")
+                return leaves!![0] as T
+            } else {
+                val e = leaves!![index]
+                index += 1
+                @Suppress("UNCHECKED_CAST")
+                return e as T
+            }
         }
 
         override fun nextIndex(): Int = index
+
+        override fun hasPrevious(): Boolean = index > 0
 
         override fun previous(): T {
             if (index <= 0) {
@@ -122,7 +136,15 @@ class TreeList<T> private constructor(private val root: Node<T>, private val lev
             }
 
             index -= 1
-            return list.root.get(list.level, index)
+
+            if (index and Node.MASK == Node.MASK) {
+                leaves = root.getLeaves(level, index)
+                @Suppress("UNCHECKED_CAST")
+                return leaves!![Node.MASK] as T
+            } else {
+                @Suppress("UNCHECKED_CAST")
+                return leaves!![index] as T
+            }
         }
 
         override fun previousIndex(): Int = index - 1
