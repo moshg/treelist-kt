@@ -45,4 +45,15 @@ internal class NodeTest {
             .added(Node.WIDTH, Node.B, 100)
         assertEquals(100, node2.get(Node.WIDTH, Node.B))
     }
+
+    @Test
+    fun set() {
+        val node = Node<Int>(null, Array(Node.B) { it })
+            .set(0, Node.B - 1, 100)
+        assertEquals(100, node.get(0, Node.B - 1))
+
+        val node2 = Node(arrayOfNulls<Node<Int>>(Node.B).also { it[0] = node }, null)
+            .set(Node.WIDTH, 1, 12)
+        assertEquals(12, node2.get(Node.WIDTH, 1))
+    }
 }
