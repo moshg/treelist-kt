@@ -1,5 +1,5 @@
 @Suppress("NAME_SHADOWING")
-internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?) {
+internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
     @Suppress("NOTHING_TO_INLINE")
     inline fun get(level: Int, index: Int): T = get(this, level, index)
 
@@ -38,7 +38,7 @@ internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?)
                 @Suppress("UNCHECKED_CAST")
                 node.leaves!![index and MASK] as T
             } else {
-                get(node.children!![(index ushr level) and MASK]!!, level - WIDTH, index)
+                get(node.nodes!![(index ushr level) and MASK]!!, level - WIDTH, index)
             }
         }
 
@@ -47,7 +47,7 @@ internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?)
             return if (level == 0) {
                 node.leaves!!
             } else {
-                getLeaves(node.children!![(index ushr level) and MASK]!!, level - WIDTH, index)
+                getLeaves(node.nodes!![(index ushr level) and MASK]!!, level - WIDTH, index)
             }
         }
 
@@ -59,15 +59,15 @@ internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?)
             var currNode = newNode
 
             while (level > 0) {
-                val newChildren = node.children!!.copyOf()
+                val newChildren = node.nodes!!.copyOf()
                 val arrIndex = (index ushr level) and MASK
                 val child = newChildren[arrIndex]
                 if (child === null) {
                     newChildren[arrIndex] = createSingle(level - WIDTH, e)
-                    currNode.children = newChildren
+                    currNode.nodes = newChildren
                     break
                 } else {
-                    currNode.children = newChildren
+                    currNode.nodes = newChildren
                     currNode = child
                 }
                 level -= WIDTH
@@ -90,10 +90,10 @@ internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?)
             var currNode = newNode
 
             while (level > 0) {
-                val newChildren = node.children!!.copyOf()
+                val newChildren = node.nodes!!.copyOf()
                 val arrIndex = (index ushr level) and MASK
                 val child = newChildren[arrIndex]
-                currNode.children = newChildren
+                currNode.nodes = newChildren
                 currNode = child!!
                 level -= WIDTH
             }
@@ -109,10 +109,10 @@ internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?)
     override fun toString(): String = buildString(B * 3) {
         if (leaves === null) {
             append("Nodes(")
-            append(children!![0])
+            append(nodes!![0])
             for (i in 1 until Node.B) {
                 append(", ")
-                val child = children!![i]
+                val child = nodes!![i]
                 if (child === null) {
                     break
                 } else {
@@ -126,7 +126,7 @@ internal class Node<T>(var children: Array<Node<T>?>?, var leaves: Array<Any?>?)
             for (i in 1 until Node.B) {
                 append(", ")
                 // Tがnullableのとき意味のあるnullが入りうるのでブレークしない
-                append(children!![i])
+                append(nodes!![i])
             }
         }
     }
