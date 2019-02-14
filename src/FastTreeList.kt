@@ -35,6 +35,29 @@ class FastTreeList<T> internal constructor(
         }
     }
 
+    fun set(index: Int, e: T): FastTreeList<T> {
+        val nodesLen = this.nodesLen
+        if (index < nodesLen) {
+            if (index < 0) {
+                throw IndexOutOfBoundsException("Index $index out of bounds")
+            }
+            val level = level
+            val newNodes = nodes!!.copyOf()
+            val i = getIndex(level, index)
+            newNodes[i] = newNodes[i]!!.set(level - WIDTH, index, e)
+            return FastTreeList(level, newNodes, nodesLen, tail, tailLen)
+        } else {
+            val tailIndex = index - nodesLen
+            if (tailIndex >= tailLen) {
+                // indexを忘れてもいいようにtailIndexを使って計算する
+                throw IndexOutOfBoundsException("Index ${tailIndex + nodesLen} out of boundds for size $size")
+            }
+            val newTail = tail.copyOf()
+            newTail[tailIndex] = e
+            return FastTreeList(level, nodes, nodesLen, newTail, tailLen)
+        }
+    }
+
     fun added(e: T): FastTreeList<T> {
         val tailLen = this.tailLen
         val tail = this.tail
