@@ -164,12 +164,20 @@ class FastTreeList<T> internal constructor(
     override fun iterator(): Iter<T> = Iter(level, nodes, nodesLen, tail, tailLen, null, 0)
 
 
-    override fun listIterator(): ListIterator<T> {
-        TODO("not implemented")
-    }
+    override fun listIterator(): ListIter<T> = ListIter(level, nodes, nodesLen, tail, tailLen, null, 0)
 
     override fun listIterator(index: Int): ListIterator<T> {
-        TODO("not implemented")
+        if (index < nodesLen) {
+            if (index < 0) {
+                throw IndexOutOfBoundsException("Index $index out of bounds")
+            }
+            return ListIter(level, nodes, nodesLen, tail, tailLen, nodes!![getIndex(level, index)]!!.getLeaves(level - WIDTH, index), index)
+        } else {
+            if (index > size) {
+                throw IndexOutOfBoundsException("Index $index out of bounds for size $size")
+            }
+            return ListIter(level, nodes, nodesLen, tail, tailLen, null, index)
+        }
     }
 
     class Iter<T> internal constructor(
@@ -261,7 +269,7 @@ class FastTreeList<T> internal constructor(
             val index = this.index - 1
             if (index < nodesLen) {
                 if (index < 0) {
-                    throw NoSuchElementException()
+                    throw NoSuchElementException("Index $index out of bounds")
                 }
                 this.index = index
                 val leafIndex = index and MASK
