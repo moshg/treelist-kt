@@ -43,6 +43,10 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
         const val WIDTH: Int = 5
         const val MASK: Int = (1 shl WIDTH) - 1
 
+        @Suppress("NOTHING_TO_INLINE")
+        @JvmStatic
+        inline fun getIndex(level: Int, i: Int): Int = (i ushr level) and MASK
+
         @JvmStatic
         fun <T> createSingle(level: Int, e: T): Node<T> {
             var level = level
@@ -64,7 +68,7 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
                 @Suppress("UNCHECKED_CAST")
                 node.leaves!![index and MASK] as T
             } else {
-                get(node.nodes!![(index ushr level) and MASK]!!, level - WIDTH, index)
+                get(node.nodes!![getIndex(level, index)]!!, level - WIDTH, index)
             }
         }
 
@@ -73,7 +77,7 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             return if (level == 0) {
                 node.leaves!!
             } else {
-                getLeaves(node.nodes!![(index ushr level) and MASK]!!, level - WIDTH, index)
+                getLeaves(node.nodes!![getIndex(level, index)]!!, level - WIDTH, index)
             }
         }
 
@@ -126,7 +130,7 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
 
             while (level > 0) {
                 val currNewNodes = currNode.nodes!!.copyOf()
-                val arrIndex = (index ushr level) and MASK
+                val arrIndex = getIndex(level, index)
                 val child = currNewNodes[arrIndex]
                 // nextNewNodeをcurrNewNodeのChildrenに追加し, currNewNodeをnextNewNodeに差し替える.
                 val nextNewNode = Node<T>(null, null)
