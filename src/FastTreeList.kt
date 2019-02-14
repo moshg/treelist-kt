@@ -72,25 +72,76 @@ class FastTreeList<T> internal constructor(
     }
 
     override fun contains(element: T): Boolean {
-        TODO("not implemented")
+        if (element === null) {
+            for (e in this) {
+                if (e === null) {
+                    return true
+                }
+            }
+            return false
+        } else {
+            for (e in this) {
+                if (element == e) {
+                    return true
+                }
+            }
+            return false
+        }
     }
 
     override fun containsAll(elements: Collection<T>): Boolean {
-        TODO("not implemented")
+        val set = HashSet<T>(size)
+        set.addAll(this)
+        return set.containsAll(elements)
     }
 
 
     override fun indexOf(element: T): Int {
-        TODO("not implemented")
+        var index = 0
+        if (element === null) {
+            for (e in this) {
+                if (e === null) {
+                    return index
+                }
+                index += 1
+            }
+            return -1
+        } else {
+            for (e in this) {
+                if (element == e) {
+                    return index
+                }
+            }
+            return -1
+        }
+    }
+
+    override fun lastIndexOf(element: T): Int {
+        var index = size
+        val iter = listIterator()
+        if (element === null) {
+            while (iter.hasPrevious()) {
+                if (iter.previous() === null) {
+                    return index - 1
+                }
+                index -= 1
+            }
+            return -1
+        } else {
+            while (iter.hasPrevious()) {
+                if (element == iter.previous()) {
+                    return index - 1
+                }
+                index -= 1
+            }
+            return -1
+        }
     }
 
     override fun iterator(): Iterator<T> {
         TODO("not implemented")
     }
 
-    override fun lastIndexOf(element: T): Int {
-        TODO("not implemented")
-    }
 
     override fun listIterator(): ListIterator<T> {
         TODO("not implemented")
