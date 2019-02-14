@@ -12,6 +12,32 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
     @Suppress("NOTHING_TO_INLINE")
     inline fun set(level: Int, index: Int, e: T): Node<T> = set(this, level, index, e)
 
+    override fun toString(): String = buildString(B * 3) {
+        if (leaves === null) {
+            append("(")
+            append(nodes!![0])
+            for (i in 1 until Node.B) {
+                val child = nodes!![i]
+                if (child === null) {
+                    break
+                } else {
+                    append(", ")
+                    append(child)
+                }
+            }
+            append(')')
+        } else {
+            append("(")
+            append(leaves!![0])
+            for (i in 1 until Node.B) {
+                append(", ")
+                // Tがnullableのとき意味のあるnullが入りうるのでブレークしない
+                append(leaves!![i])
+            }
+            append(')')
+        }
+    }
+
     companion object {
         const val B: Int = 32
         const val WIDTH: Int = 5
@@ -117,32 +143,6 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             currNewNode.leaves = newLeaves
 
             return retNode
-        }
-    }
-
-    override fun toString(): String = buildString(B * 3) {
-        if (leaves === null) {
-            append("(")
-            append(nodes!![0])
-            for (i in 1 until Node.B) {
-                val child = nodes!![i]
-                if (child === null) {
-                    break
-                } else {
-                    append(", ")
-                    append(child)
-                }
-            }
-            append(')')
-        } else {
-            append("(")
-            append(leaves!![0])
-            for (i in 1 until Node.B) {
-                append(", ")
-                // Tがnullableのとき意味のあるnullが入りうるのでブレークしない
-                append(leaves!![i])
-            }
-            append(')')
         }
     }
 }
