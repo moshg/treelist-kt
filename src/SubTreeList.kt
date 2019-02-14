@@ -72,17 +72,6 @@ class SubTreeList<T> internal constructor(
         }
     }
 
-    override fun subList(fromIndex: Int, toIndex: Int): SubTreeList<T> {
-        if (fromIndex > toIndex) {
-            throw IllegalArgumentException("fromIndex $fromIndex greater than toIndex $toIndex")
-        } else if (fromIndex < 0) {
-            throw IndexOutOfBoundsException("fromIndex $fromIndex out of bounds")
-        } else if (toIndex > size) {
-            throw IndexOutOfBoundsException("toIndex $toIndex out of bounds for size $size")
-        }
-        return SubTreeList(root, level, fromIndex + start, toIndex + start)
-    }
-
     class Iter<T> internal constructor(
         private val root: Node<T>?,
         private val level: Int,
@@ -164,5 +153,33 @@ class SubTreeList<T> internal constructor(
         }
 
         override fun previousIndex(): Int = index - 1
+    }
+
+    override fun subList(fromIndex: Int, toIndex: Int): SubTreeList<T> {
+        if (fromIndex > toIndex) {
+            throw IllegalArgumentException("fromIndex $fromIndex greater than toIndex $toIndex")
+        } else if (fromIndex < 0) {
+            throw IndexOutOfBoundsException("fromIndex $fromIndex out of bounds")
+        } else if (toIndex > size) {
+            throw IndexOutOfBoundsException("toIndex $toIndex out of bounds for size $size")
+        }
+        return SubTreeList(root, level, fromIndex + start, toIndex + start)
+    }
+
+    override fun toString(): String {
+        if (size == 0) {
+            return "[]"
+        }
+
+        val i = iterator()
+        return buildString(size * 2) {
+            append('[')
+            append(i.next())
+            for (e in i) {
+                append(", ")
+                append(e)
+            }
+            append(']')
+        }
     }
 }
