@@ -6,11 +6,13 @@ import Node.Companion.getIndex
 
 class FastTreeList<T> internal constructor(
     private val level: Int,
-    private var nodes: Array<Node<T>?>?,
+    private var nodes: Array<Node<T>?>,
     private var nodesLen: Int,
     private var tail: Array<Any?>,
     private var tailLen: Int
 ) : List<T> {
+
+    constructor() : this(-WIDTH, emptyNodes(), 0, emptyTail(), 0)
 
     override val size: Int
         get() = nodesLen + tailLen
@@ -24,7 +26,7 @@ class FastTreeList<T> internal constructor(
             }
             val level = level
             val i = getIndex(level, index)
-            nodes!![i]!!.get(level - WIDTH, index)
+            nodes[i]!!.get(level - WIDTH, index)
         } else {
             val tailIndex = index - nodesLen
             if (tailIndex >= tailLen) {
@@ -43,7 +45,7 @@ class FastTreeList<T> internal constructor(
                 throw IndexOutOfBoundsException("Index $index out of bounds")
             }
             val level = level
-            val newNodes = nodes!!.copyOf()
+            val newNodes = nodes.copyOf()
             val i = getIndex(level, index)
             newNodes[i] = newNodes[i]!!.set(level - WIDTH, index, e)
             return FastTreeList(level, newNodes, nodesLen, tail, tailLen)
@@ -69,7 +71,7 @@ class FastTreeList<T> internal constructor(
             return FastTreeList(level, nodes, nodesLen, newTail, tailLen + 1)
         } else {
             val nodes = this.nodes
-            if (nodes === null) {
+            if (nodes === emptyNodes<Node<T>?>()) {
                 // nodesが未初期化状態の場合
                 val newNodes = arrayOfNulls<Node<T>>(B).also { it[0] = Node(null, tail) }
                 return FastTreeList(level + WIDTH, newNodes, B, arrayOfNulls(B), 0)
@@ -171,7 +173,15 @@ class FastTreeList<T> internal constructor(
             if (index < 0) {
                 throw IndexOutOfBoundsException("Index $index out of bounds")
             }
-            return ListIter(level, nodes, nodesLen, tail, tailLen, nodes!![getIndex(level, index)]!!.getLeaves(level - WIDTH, index), index)
+            return ListIter(
+                level,
+                nodes,
+                nodesLen,
+                tail,
+                tailLen,
+                nodes[getIndex(level, index)]!!.getLeaves(level - WIDTH, index),
+                index
+            )
         } else {
             if (index > size) {
                 throw IndexOutOfBoundsException("Index $index out of bounds for size $size")
@@ -182,7 +192,7 @@ class FastTreeList<T> internal constructor(
 
     class Iter<T> internal constructor(
         private val level: Int,
-        private val nodes: Array<Node<T>?>?,
+        private val nodes: Array<Node<T>?>,
         private val nodesLen: Int,
         private val tail: Array<Any?>,
         private val tailLen: Int,
@@ -201,7 +211,7 @@ class FastTreeList<T> internal constructor(
                 this.index = index + 1
                 val leafIndex = index and MASK
                 if (leafIndex == 0) {
-                    leaves = nodes!![getIndex(level, index)]!!.getLeaves(level - WIDTH, index)
+                    leaves = nodes[getIndex(level, index)]!!.getLeaves(level - WIDTH, index)
                     @Suppress("UNCHECKED_CAST")
                     return leaves!![0] as T
                 } else {
@@ -222,7 +232,7 @@ class FastTreeList<T> internal constructor(
 
     class ListIter<T> internal constructor(
         private val level: Int,
-        private val nodes: Array<Node<T>?>?,
+        private val nodes: Array<Node<T>?>,
         private val nodesLen: Int,
         private val tail: Array<Any?>,
         private val tailLen: Int,
@@ -243,7 +253,7 @@ class FastTreeList<T> internal constructor(
                 this.index = index + 1
                 val leafIndex = index and MASK
                 if (leafIndex == 0) {
-                    leaves = nodes!![getIndex(level, index)]!!.getLeaves(level - WIDTH, index)
+                    leaves = nodes[getIndex(level, index)]!!.getLeaves(level - WIDTH, index)
                     @Suppress("UNCHECKED_CAST")
                     return leaves!![0] as T
                 } else {
@@ -274,7 +284,7 @@ class FastTreeList<T> internal constructor(
                 this.index = index
                 val leafIndex = index and MASK
                 if (leafIndex == MASK) {
-                    val leaves = nodes!![getIndex(level, index)]!!.getLeaves(level - WIDTH, index)
+                    val leaves = nodes[getIndex(level, index)]!!.getLeaves(level - WIDTH, index)
                     this.leaves = leaves
                     @Suppress("UNCHECKED_CAST")
                     return leaves[leaves.size - 1] as T
@@ -293,5 +303,19 @@ class FastTreeList<T> internal constructor(
 
     override fun subList(fromIndex: Int, toIndex: Int): List<T> {
         TODO("not implemented")
+    }
+
+    companion object {
+        @JvmStatic
+        private val emptyNodes: Array<Node<*>?> = arrayOfNulls(B)
+
+        @Suppress("UNCHECKED_CAST")
+        internal fun <T> emptyNodes(): Array<Node<T>?> = emptyNodes as Array<Node<T>?>
+
+        @JvmStatic
+        private val emptyTail: Array<Any?> = arrayOfNulls(B)
+
+        @Suppress("UNCHECKED_CAST")
+        internal fun emptyTail(): Array<Any?> = emptyTail
     }
 }
