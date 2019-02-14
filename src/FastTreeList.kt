@@ -182,7 +182,10 @@ class FastTreeList<T> internal constructor(
         private var index: Int
     ) : Iterator<T> {
 
-        override fun hasNext(): Boolean = index < nodesLen + tailLen
+        private val size: Int
+            get() = nodesLen + tailLen
+
+        override fun hasNext(): Boolean = index < size
 
         override fun next(): T {
             val index = this.index
@@ -200,9 +203,80 @@ class FastTreeList<T> internal constructor(
             } else {
                 val tailIndex = index - nodesLen
                 if (tailIndex >= tailLen) {
-                    throw NoSuchElementException("Index $index out of bounds for size ${nodesLen + tailLen}")
+                    throw NoSuchElementException("Index $index out of bounds for size $size")
                 }
                 this.index = index + 1
+                @Suppress("UNCHECKED_CAST")
+                return tail[tailIndex] as T
+            }
+        }
+    }
+
+    class ListIter<T> internal constructor(
+        private val level: Int,
+        private val nodes: Array<Node<T>?>?,
+        private val nodesLen: Int,
+        private val tail: Array<Any?>,
+        private val tailLen: Int,
+        private var leaves: Array<Any?>?,
+        private var index: Int
+    ) : ListIterator<T> {
+
+        private val size: Int
+            get() = nodesLen + tailLen
+
+        override fun hasNext(): Boolean = index < size
+
+        override fun nextIndex(): Int = index
+
+        override fun next(): T {
+            val index = this.index
+            if (index < nodesLen) {
+                this.index = index + 1
+                val leafIndex = index and MASK
+                if (leafIndex == 0) {
+                    leaves = nodes!![getIndex(level, index)]!!.getLeaves(level - WIDTH, index)
+                    @Suppress("UNCHECKED_CAST")
+                    return leaves!![0] as T
+                } else {
+                    @Suppress("UNCHECKED_CAST")
+                    return leaves!![leafIndex] as T
+                }
+            } else {
+                val tailIndex = index - nodesLen
+                if (tailIndex >= tailLen) {
+                    throw NoSuchElementException("Index $index out of bounds for size $size")
+                }
+                this.index = index + 1
+                @Suppress("UNCHECKED_CAST")
+                return tail[tailIndex] as T
+            }
+        }
+
+        override fun hasPrevious(): Boolean = index > 0
+
+        override fun previousIndex(): Int = index - 1
+
+        override fun previous(): T {
+            val index = this.index - 1
+            if (index < nodesLen) {
+                if (index < 0) {
+                    throw NoSuchElementException()
+                }
+                this.index = index
+                val leafIndex = index and MASK
+                if (leafIndex == MASK) {
+                    val leaves = nodes!![getIndex(level, index)]!!.getLeaves(level - WIDTH, index)
+                    this.leaves = leaves
+                    @Suppress("UNCHECKED_CAST")
+                    return leaves[leaves.size - 1] as T
+                } else {
+                    @Suppress("UNCHECKED_CAST")
+                    return leaves!![leafIndex] as T
+                }
+            } else {
+                this.index = index
+                val tailIndex = index - nodesLen
                 @Suppress("UNCHECKED_CAST")
                 return tail[tailIndex] as T
             }
