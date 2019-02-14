@@ -122,7 +122,7 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
 
     override fun toString(): String = buildString(B * 3) {
         if (leaves === null) {
-            append("Nodes(")
+            append("(")
             append(nodes!![0])
             for (i in 1 until Node.B) {
                 val child = nodes!![i]
@@ -135,7 +135,7 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             }
             append(')')
         } else {
-            append("Leaves(")
+            append("(")
             append(leaves!![0])
             for (i in 1 until Node.B) {
                 append(", ")
