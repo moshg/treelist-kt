@@ -4,7 +4,7 @@ import Node.Companion.WIDTH
 import Node.Companion.createSingleLeaves
 import Node.Companion.getIndex
 
-class FastTreeList<T> internal constructor(
+class TreeList<T> internal constructor(
     private val level: Int,
     private var nodes: Array<Node<T>?>,
     private var nodesLen: Int,
@@ -38,7 +38,7 @@ class FastTreeList<T> internal constructor(
         }
     }
 
-    fun set(index: Int, e: T): FastTreeList<T> {
+    fun set(index: Int, e: T): TreeList<T> {
         val nodesLen = this.nodesLen
         if (index < nodesLen) {
             if (index < 0) {
@@ -48,7 +48,7 @@ class FastTreeList<T> internal constructor(
             val newNodes = nodes.copyOf()
             val i = getIndex(level, index)
             newNodes[i] = newNodes[i]!!.set(level - WIDTH, index, e)
-            return FastTreeList(level, newNodes, nodesLen, tail, tailLen)
+            return TreeList(level, newNodes, nodesLen, tail, tailLen)
         } else {
             val tailIndex = index - nodesLen
             if (tailIndex >= tailLen) {
@@ -57,24 +57,24 @@ class FastTreeList<T> internal constructor(
             }
             val newTail = tail.copyOf()
             newTail[tailIndex] = e
-            return FastTreeList(level, nodes, nodesLen, newTail, tailLen)
+            return TreeList(level, nodes, nodesLen, newTail, tailLen)
         }
     }
 
-    fun added(e: T): FastTreeList<T> {
+    fun added(e: T): TreeList<T> {
         val tailLen = this.tailLen
         val tail = this.tail
         if (tailLen < tail.size) {
             // tailが空いている場合
             val newTail = tail.copyOf()
             newTail[tailLen] = e
-            return FastTreeList(level, nodes, nodesLen, newTail, tailLen + 1)
+            return TreeList(level, nodes, nodesLen, newTail, tailLen + 1)
         } else {
             val nodes = this.nodes
             if (nodes === emptyNodes<Node<T>?>()) {
                 // nodesが未初期化状態の場合
                 val newNodes = arrayOfNulls<Node<T>>(B).also { it[0] = Node(null, tail) }
-                return FastTreeList(level + WIDTH, newNodes, B, arrayOfNulls(B), 0)
+                return TreeList(level + WIDTH, newNodes, B, arrayOfNulls(B), 0)
             } else if (nodesLen == 1 shl level) {
                 // nodesが埋まっている場合
                 val oldRoot = Node(nodes, null)
@@ -83,7 +83,7 @@ class FastTreeList<T> internal constructor(
                     it[0] = oldRoot
                     it[1] = second
                 }
-                return FastTreeList(level + WIDTH, newNodes, nodesLen + B, arrayOfNulls(B), 0)
+                return TreeList(level + WIDTH, newNodes, nodesLen + B, arrayOfNulls(B), 0)
             } else {
                 // nodesに空きがある場合
                 val level = this.level
@@ -92,7 +92,7 @@ class FastTreeList<T> internal constructor(
                 val newNodes = nodes.copyOf()
                 newNodes[index] = newNodes[index]?.addedLeaves(level - WIDTH, size, tail)
                     ?: createSingleLeaves(level - WIDTH, tail)
-                return FastTreeList(level, newNodes, nodesLen + B, arrayOfNulls(B), 0)
+                return TreeList(level, newNodes, nodesLen + B, arrayOfNulls(B), 0)
             }
         }
     }
