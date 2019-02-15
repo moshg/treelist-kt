@@ -12,7 +12,7 @@ class TreeList<T> internal constructor(
     private var tailLen: Int
 ) : List<T> {
 
-    constructor() : this(-WIDTH, emptyNodes(), 0, emptyTail(), 0)
+    constructor() : this(0, emptyNodes(), 0, emptyTail(), 0)
 
     override val size: Int
         get() = nodesLen + tailLen
@@ -70,11 +70,12 @@ class TreeList<T> internal constructor(
             newTail[tailLen] = e
             return TreeList(level, nodes, nodesLen, newTail, tailLen + 1)
         } else {
+            val newTail = arrayOfNulls<Any?>(B).also { it[0] = e }
             val nodes = this.nodes
             if (nodes === emptyNodes<Node<T>?>()) {
                 // nodesが未初期化状態の場合
                 val newNodes = arrayOfNulls<Node<T>>(B).also { it[0] = Node(null, tail) }
-                return TreeList(level + WIDTH, newNodes, B, arrayOfNulls(B), 0)
+                return TreeList(level + WIDTH, newNodes, B, newTail, 1)
             } else if (nodesLen == 1 shl level) {
                 // nodesが埋まっている場合
                 val oldRoot = Node(nodes, null)
@@ -83,7 +84,7 @@ class TreeList<T> internal constructor(
                     it[0] = oldRoot
                     it[1] = second
                 }
-                return TreeList(level + WIDTH, newNodes, nodesLen + B, arrayOfNulls(B), 0)
+                return TreeList(level + WIDTH, newNodes, nodesLen + B, newTail, 1)
             } else {
                 // nodesに空きがある場合
                 val level = this.level
@@ -92,7 +93,7 @@ class TreeList<T> internal constructor(
                 val newNodes = nodes.copyOf()
                 newNodes[index] = newNodes[index]?.addedLeaves(level - WIDTH, size, tail)
                     ?: createSingleLeaves(level - WIDTH, tail)
-                return TreeList(level, newNodes, nodesLen + B, arrayOfNulls(B), 0)
+                return TreeList(level, newNodes, nodesLen + B, newTail, 1)
             }
         }
     }
@@ -124,18 +125,21 @@ class TreeList<T> internal constructor(
     override fun indexOf(element: T): Int {
         var index = 0
         if (element === null) {
-            for (e in this) {
-                if (e === null) {
+            val iter = iterator()
+            while (iter.hasNext()) {
+                if (iter.next() === null) {
                     return index
                 }
                 index += 1
             }
             return -1
         } else {
-            for (e in this) {
-                if (element == e) {
+            val iter = iterator()
+            while (iter.hasNext()) {
+                if (element == iter.next()) {
                     return index
                 }
+                index += 1
             }
             return -1
         }
@@ -143,7 +147,7 @@ class TreeList<T> internal constructor(
 
     override fun lastIndexOf(element: T): Int {
         var index = size
-        val iter = listIterator()
+        val iter = listIterator(size)
         if (element === null) {
             while (iter.hasPrevious()) {
                 if (iter.previous() === null) {
