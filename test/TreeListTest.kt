@@ -22,20 +22,20 @@ internal class TreeListTest {
         assertEquals(6, l[1])
 
         var l2 = TreeList<Int>()
-        for (i in 0 until Node.B) {
+        for (i in 0 until B) {
             l2 = l2.added(i + 2)
         }
         var l3 = l2
-        for (i in Node.B until Node.B * 2) {
+        for (i in B until B * 2) {
             l3 = l3.added(i + 2)
         }
 
-        assertEquals(Node.B, l2.size)
-        for (i in 0 until Node.B) {
+        assertEquals(B, l2.size)
+        for (i in 0 until B) {
             assertEquals(i + 2, l2[i])
         }
-        assertEquals(Node.B * 2, l3.size)
-        for (i in 0 until Node.B * 2) {
+        assertEquals(B * 2, l3.size)
+        for (i in 0 until B * 2) {
             assertEquals(i + 2, l3[i])
         }
     }
@@ -87,7 +87,7 @@ internal class TreeListTest {
         assertThrows<NoSuchElementException> { emptyIter.next() }
 
         var l = treeListOf<Int>()
-        for (i in 0 until Node.B * 2) {
+        for (i in 0 until B * 2) {
             l = l.added(i + 3)
         }
         var i = 0
@@ -108,7 +108,7 @@ internal class TreeListTest {
         assertThrows<NoSuchElementException> { emptyIter.previous() }
 
         var l = treeListOf<Int>()
-        for (i in 0 until Node.B * 2) {
+        for (i in 0 until B * 2) {
             l = l.added(i + 3)
         }
         var i = 0
@@ -120,7 +120,7 @@ internal class TreeListTest {
         }
         assertThrows<NoSuchElementException> { iter.next() }
 
-        i = Node.B * 2 - 1
+        i = B * 2 - 1
         val iterRev = l.listIterator(l.size)
         while (iterRev.hasPrevious()) {
             assertEquals(i, iterRev.previousIndex())

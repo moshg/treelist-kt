@@ -1,6 +1,3 @@
-import Node.Companion.B
-import Node.Companion.MASK
-import Node.Companion.WIDTH
 import Node.Companion.createSingleLeaves
 import Node.Companion.getIndex
 

@@ -19,7 +19,7 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
         if (leaves === null) {
             append("(")
             append(nodes!![0])
-            for (i in 1 until Node.B) {
+            for (i in 1 until B) {
                 val child = nodes!![i]
                 if (child === null) {
                     break
@@ -32,7 +32,7 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
         } else {
             append("(")
             append(leaves!![0])
-            for (i in 1 until Node.B) {
+            for (i in 1 until B) {
                 append(", ")
                 // Tがnullableのとき意味のあるnullが入りうるのでブレークしない
                 append(leaves!![i])
@@ -42,24 +42,20 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
     }
 
     companion object {
-        const val B: Int = 32
-        const val WIDTH: Int = 5
-        const val MASK: Int = (1 shl WIDTH) - 1
-
         @Suppress("NOTHING_TO_INLINE")
         @JvmStatic
         inline fun getIndex(level: Int, i: Int): Int = (i ushr level) and MASK
 
         @JvmStatic
         fun <T> createSingle(level: Int, e: T): Node<T> =
-            createSingleLeaves(level, arrayOfNulls<Any?>(Node.B).also { it[0] = e })
+            createSingleLeaves(level, arrayOfNulls<Any?>(B).also { it[0] = e })
 
         @JvmStatic
         fun <T> createSingleLeaves(level: Int, leaves: Array<Any?>): Node<T> {
             var level = level
             var node = Node<T>(null, leaves)
             while (level > 0) {
-                val nodes = arrayOfNulls<Node<T>>(Node.B)
+                val nodes = arrayOfNulls<Node<T>>(B)
                 nodes[0] = node
                 node = Node(nodes, null)
                 level -= WIDTH
