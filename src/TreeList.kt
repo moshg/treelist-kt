@@ -3,10 +3,10 @@ import Node.Companion.getIndex
 
 class TreeList<T> internal constructor(
     private val level: Int,
-    private var nodes: Array<Node<T>?>,
-    private var nodesLen: Int,
-    private var tail: Array<Any?>,
-    private var tailLen: Int
+    private val nodes: Array<Node<T>?>,
+    private val nodesLen: Int,
+    private val tail: Array<Any?>,
+    private val tailLen: Int
 ) : List<T> {
 
     constructor() : this(0, emptyNodes(), 0, emptyTail(), 0)
