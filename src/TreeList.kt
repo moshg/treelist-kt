@@ -16,10 +16,15 @@ class TreeList<T> internal constructor(
 
     override fun isEmpty(): Boolean = size == 0
 
+    private fun indexUnderflowException(index: Int) = IndexOutOfBoundsException("Index $index out of bounds")
+
+    private fun indexOverflowException(index: Int) =
+        IndexOutOfBoundsException("Index $index out of bounds for length $size")
+
     override operator fun get(index: Int): T {
         return if (index < nodesLen) {
             if (index < 0) {
-                throw IndexOutOfBoundsException("Index $index out of bounds")
+                throw indexUnderflowException(index)
             }
             val level = level
             val i = getIndex(level, index)
@@ -28,7 +33,7 @@ class TreeList<T> internal constructor(
             val tailIndex = index - nodesLen
             if (tailIndex >= tailLen) {
                 // indexを忘れてもいいようにtailIndexを使って計算する
-                throw IndexOutOfBoundsException("Index ${tailIndex + nodesLen} out of boundds for size $size")
+                throw indexOverflowException(tailIndex + nodesLen)
             }
             @Suppress("UNCHECKED_CAST")
             tail[tailIndex] as T
@@ -39,7 +44,7 @@ class TreeList<T> internal constructor(
         val nodesLen = this.nodesLen
         if (index < nodesLen) {
             if (index < 0) {
-                throw IndexOutOfBoundsException("Index $index out of bounds")
+                throw indexUnderflowException(index)
             }
             val level = level
             val newNodes = nodes.copyOf()
@@ -50,7 +55,7 @@ class TreeList<T> internal constructor(
             val tailIndex = index - nodesLen
             if (tailIndex >= tailLen) {
                 // indexを忘れてもいいようにtailIndexを使って計算する
-                throw IndexOutOfBoundsException("Index ${tailIndex + nodesLen} out of boundds for size $size")
+                throw indexOverflowException(tailIndex + nodesLen)
             }
             val newTail = tail.copyOf()
             newTail[tailIndex] = e
@@ -172,7 +177,7 @@ class TreeList<T> internal constructor(
     override fun listIterator(index: Int): ListIterator<T> {
         if (index < nodesLen) {
             if (index < 0) {
-                throw IndexOutOfBoundsException("Index $index out of bounds")
+                throw indexUnderflowException(index)
             }
             return ListIter(
                 level,
@@ -185,7 +190,7 @@ class TreeList<T> internal constructor(
             )
         } else {
             if (index > size) {
-                throw IndexOutOfBoundsException("Index $index out of bounds for size $size")
+                throw indexOverflowException(index)
             }
             return ListIter(level, nodes, nodesLen, tail, tailLen, null, index)
         }
