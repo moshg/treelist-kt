@@ -34,6 +34,10 @@ internal class TreeListTest {
         for (i in 0 until Node.B) {
             assertEquals(i + 2, l2[i])
         }
+        assertEquals(Node.B * 2, l3.size)
+        for (i in 0 until Node.B * 2) {
+            assertEquals(i + 2, l3[i])
+        }
     }
 
     @Test
@@ -73,7 +77,7 @@ internal class TreeListTest {
     fun lastIndexOf() {
         assertEquals(-1, TreeList<Int>().lastIndexOf(0))
         assertEquals(-1, treeListOf(0, 1, 2).lastIndexOf(3))
-        assertEquals(4, treeListOf(0, 2, 4, 6, 2).lastIndexOf(2))
+        assertEquals(4, treeListOf(0, 2, 4, 6, 2, 0).lastIndexOf(2))
     }
 
     @Test
