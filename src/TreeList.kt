@@ -169,7 +169,21 @@ class TreeList<T> internal constructor(
         }
     }
 
-    override fun iterator(): Iter<T> = Iter(level, nodes, nodesLen, tail, tailLen, null, 0)
+    override fun iterator(): Iter<T> {
+        val focus = arrayOfNulls<Array<Node<T>?>>(level / WIDTH)
+        val leaves: Array<Any?>?
+        if (nodes[0] === null) {
+            leaves = tail
+        } else {
+            focus[focus.size - 1] = nodes
+            for (i in 1..(focus.size - 1)) {
+                focus[i - 1] = focus[i]!![0]!!.nodes
+            }
+            leaves = focus[0]!![0]!!.leaves
+        }
+        @Suppress("UNCHECKED_CAST")
+        return Iter(focus as Array<Array<Node<T>?>>, nodesLen, tail, tailLen, leaves, 0, B)
+    }
 
 
     override fun listIterator(): ListIter<T> = ListIter(level, nodes, nodesLen, tail, tailLen, null, 0)
@@ -197,13 +211,13 @@ class TreeList<T> internal constructor(
     }
 
     class Iter<T> internal constructor(
-        private val level: Int,
-        private val nodes: Array<Node<T>?>,
+        private val focus: Array<Array<Node<T>?>>,
         private val nodesLen: Int,
         private val tail: Array<Any?>,
         private val tailLen: Int,
         private var leaves: Array<Any?>?,
-        private var index: Int
+        private var index: Int,
+        private var jump: Int
     ) : Iterator<T> {
 
         private val size: Int
@@ -211,28 +225,42 @@ class TreeList<T> internal constructor(
 
         override fun hasNext(): Boolean = index < size
 
+        @Suppress("UNCHECKED_CAST")
         override fun next(): T {
             val index = this.index
-            if (index < nodesLen) {
-                this.index = index + 1
-                val leafIndex = index and MASK
-                if (leafIndex == 0) {
-                    leaves = nodes[getIndex(level, index)]!!.getLeaves(level - WIDTH, index)
-                    @Suppress("UNCHECKED_CAST")
-                    return leaves!![0] as T
+            if (index >= nodesLen) {
+                if (index >= nodesLen + tailLen) {
+                    throw NoSuchElementException("Index $index out of bounds for size ${nodesLen + tailLen}")
                 } else {
-                    @Suppress("UNCHECKED_CAST")
-                    return leaves!![leafIndex] as T
+                    this.index = index + 1
+                    return tail[index and MASK] as T
                 }
-            } else {
-                val tailIndex = index - nodesLen
-                if (tailIndex >= tailLen) {
-                    throw NoSuchElementException("Index $index out of bounds for size $size")
-                }
-                this.index = index + 1
-                @Suppress("UNCHECKED_CAST")
-                return tail[tailIndex] as T
             }
+
+            if (index != jump) {
+                this.index = index + 1
+                return leaves!![index and MASK] as T
+            }
+            jump += B
+            val diff = index xor (index - 1)
+            var level = WIDTH * 2
+            var focusIndex = 0
+            while ((diff ushr level) != 0) {
+                level += WIDTH
+                focusIndex += 1
+            }
+            level -= WIDTH
+
+            while (focusIndex > 0) {
+                focus[focusIndex - 1] = focus[focusIndex][getIndex(level, index)]!!.nodes!!
+                level -= WIDTH
+                focusIndex -= 1
+            }
+
+            leaves = focus[0][getIndex(WIDTH, index)]!!.leaves
+
+            this.index = index + 1
+            return leaves!![index and MASK] as T
         }
     }
 
