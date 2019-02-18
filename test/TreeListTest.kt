@@ -176,6 +176,9 @@ internal class TreeListTest {
                 add(i + 3)
             }
         }.build()
+        for (i in 0 until B * B + 1) {
+            assertEquals(i + 3, fullNodes[i])
+        }
         for (i in 0 until B * B * B + 1) {
             assertEquals(i + 3, l3[i])
         }
