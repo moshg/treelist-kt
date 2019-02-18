@@ -32,13 +32,13 @@ class TreeListBuilder<T> internal constructor(
                 this.nodesLen = B
             } else if (nodesLen == 1 shl (level + WIDTH)) {
                 // nodesが埋まっている場合
-                this.level += WIDTH
                 val oldRoot = Node(nodes, null)
                 val second = Node.createSingleLeaves<T>(level, tail)
                 this.nodes = arrayOfNulls<Node<T>>(B).also {
                     it[0] = oldRoot
                     it[1] = second
                 }
+                this.level += WIDTH
                 nodesLen += B
             } else {
                 // nodesに空きがある場合
