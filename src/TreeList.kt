@@ -347,11 +347,17 @@ class TreeList<T> internal constructor(
         } else if (nodesLen == 0) {
             // nodesだけが空のとき
             return TreeListBuilder(0, null, 0, tail.copyOf(), tailLen)
+        } else if (nodesLen == 1 shl (level + WIDTH)) {
+            // nodesがいっぱいのとき
+            return TreeListBuilder(level, nodes, nodesLen, tail.copyOf(), tailLen)
         } else {
             // 最後のノードのからルートまでのノードとテイルをコピーする
             val newNodes = nodes.copyOf()
             val index = nodesLen and MASK
-            newNodes[index] = newNodes[index]!!.copyOf(level - WIDTH, nodesLen)
+            val end = newNodes[index]
+            if (end !== null) {
+                newNodes[index] = end.copy(level - WIDTH, nodesLen)
+            }
             return TreeListBuilder(level, newNodes, nodesLen, tail.copyOf(), tailLen)
         }
     }

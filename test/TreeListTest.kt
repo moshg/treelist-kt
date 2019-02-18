@@ -167,22 +167,35 @@ internal class TreeListTest {
             assertEquals(i + 3, l2[i])
         }
 
-        val l3 = buildTreeList<Int> {
+        var fullNodes = TreeList<Int>()
+        for (i in 0 until B * B + 1) {
+            fullNodes = fullNodes.added(i + 3)
+        }
+        val l3 = fullNodes.builder().apply {
+            for (i in B * B + 1 until B * B * B + 1) {
+                add(i + 3)
+            }
+        }.build()
+        for (i in 0 until B * B * B + 1) {
+            assertEquals(i + 3, l3[i])
+        }
+
+        val l4 = buildTreeList<Int> {
             for (i in 0 until B * B - 2) {
                 add(i + 3)
             }
         }
-        val l4 = l3.builder().apply {
+        val l5 = l4.builder().apply {
             for (i in (B * B - 2) until B * B * B + 1) {
                 add(i + 3)
             }
         }.build()
         for (i in 0 until B * B - 2) {
-            assertEquals(i + 3, l3[i])
-        }
-        assertThrows<IndexOutOfBoundsException> { l3[B * B - 2] }
-        for (i in 0 until B * B * B + 1) {
             assertEquals(i + 3, l4[i])
+        }
+        assertThrows<IndexOutOfBoundsException> { l4[B * B - 2] }
+        for (i in 0 until B * B * B + 1) {
+            assertEquals(i + 3, l5[i])
         }
     }
 }
