@@ -15,13 +15,13 @@ internal class TreeListBuilderTest {
         assertEquals(2, l[0])
         assertEquals(3, l[1])
 
-        for (i in 0 until B * B + 1) {
+        for (i in 0 until B * B * B + 1) {
             b.add(i + 5)
         }
         val l2 = b.build()
         assertEquals(2, l[0])
         assertEquals(3, l[1])
-        for (i in 0 until B * B + 1) {
+        for (i in 0 until B * B * B + 1) {
             assertEquals(i + 5, l2[i])
         }
     }
