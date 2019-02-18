@@ -9,3 +9,9 @@ fun <T> treeListOf(vararg elements: T): TreeList<T> {
     }
     return l
 }
+
+fun <T> buildTreeList(block: TreeListBuilder<T>.() -> Unit): TreeList<T> {
+    val builder = TreeListBuilder<T>()
+    builder.block()
+    return builder.build()
+}
