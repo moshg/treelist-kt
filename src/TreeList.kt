@@ -340,6 +340,22 @@ class TreeList<T> internal constructor(
         TODO("not implemented")
     }
 
+    fun builder(): TreeListBuilder<T> {
+        if (tailLen == 0) {
+            // 空のとき
+            return TreeListBuilder(0, null, 0, null, 0)
+        } else if (nodesLen == 0) {
+            // nodesだけが空のとき
+            return TreeListBuilder(0, null, 0, tail.copyOf(), tailLen)
+        } else {
+            // 最後のノードのからルートまでのノードとテイルをコピーする
+            val newNodes = nodes.copyOf()
+            val index = nodesLen and MASK
+            newNodes[index] = newNodes[index]!!.copyOf(level - WIDTH, nodesLen)
+            return TreeListBuilder(level, newNodes, nodesLen, tail.copyOf(), tailLen)
+        }
+    }
+
     companion object {
         @JvmStatic
         private val emptyNodes: Array<Node<*>?> = arrayOfNulls(B)
