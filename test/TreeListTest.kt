@@ -144,4 +144,45 @@ internal class TreeListTest {
         }
         assertThrows<NoSuchElementException> { iterRev.previous() }
     }
+
+    @Test
+    fun builder() {
+        val empty = TreeList<Int>()
+        val l = empty.builder().apply {
+            for (i in 0 until B * B * B + 1) {
+                add(i + 3)
+            }
+        }.build()
+        for (i in 0 until B * B * B + 1) {
+            assertEquals(i + 3, l[i])
+        }
+
+        val tail = TreeList<Int>().added(3).added(4).added(5)
+        val l2 = tail.builder().apply {
+            for (i in 3 until B * B * B + 1) {
+                add(i + 3)
+            }
+        }.build()
+        for (i in 0 until B * B * B + 1) {
+            assertEquals(i + 3, l2[i])
+        }
+
+        val l3 = buildTreeList<Int> {
+            for (i in 0 until B * B - 2) {
+                add(i + 3)
+            }
+        }
+        val l4 = l3.builder().apply {
+            for (i in (B * B - 2) until B * B * B + 1) {
+                add(i + 3)
+            }
+        }.build()
+        for (i in 0 until B * B - 2) {
+            assertEquals(i + 3, l3[i])
+        }
+        assertThrows<IndexOutOfBoundsException> { l3[B * B - 2] }
+        for (i in 0 until B * B * B + 1) {
+            assertEquals(i + 3, l4[i])
+        }
+    }
 }
