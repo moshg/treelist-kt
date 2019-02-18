@@ -78,7 +78,7 @@ class TreeList<T> internal constructor(
                 // nodesが未初期化状態の場合
                 val newNodes = arrayOfNulls<Node<T>>(B).also { it[0] = Node(null, tail) }
                 return TreeList(level + WIDTH, newNodes, B, newTail, 1)
-            } else if (nodesLen == 1 shl level) {
+            } else if (nodesLen == 1 shl (level + WIDTH)) {
                 // nodesが埋まっている場合
                 val oldRoot = Node(nodes, null)
                 val second = Node.createSingleLeaves<T>(level, tail)
@@ -93,7 +93,7 @@ class TreeList<T> internal constructor(
                 val nodesLen = this.nodesLen
                 val index = getIndex(level, nodesLen)
                 val newNodes = nodes.copyOf()
-                newNodes[index] = newNodes[index]?.addedLeaves(level - WIDTH, size, tail)
+                newNodes[index] = newNodes[index]?.addedLeaves(level - WIDTH, nodesLen, tail)
                     ?: createSingleLeaves(level - WIDTH, tail)
                 return TreeList(level, newNodes, nodesLen + B, newTail, 1)
             }
@@ -176,13 +176,13 @@ class TreeList<T> internal constructor(
             leaves = tail
         } else {
             focus[focus.size - 1] = nodes
-            for (i in 1..(focus.size - 1)) {
+            for (i in (focus.size - 1) downTo 1) {
                 focus[i - 1] = focus[i]!![0]!!.nodes
             }
             leaves = focus[0]!![0]!!.leaves
         }
         @Suppress("UNCHECKED_CAST")
-        return Iter(focus as Array<Array<Node<T>?>>, nodesLen, tail, tailLen, leaves, 0, B)
+        return Iter(focus as Array<Array<Node<T>?>>, nodesLen, tail, tailLen, leaves)
     }
 
 
@@ -215,10 +215,11 @@ class TreeList<T> internal constructor(
         private val nodesLen: Int,
         private val tail: Array<Any?>,
         private val tailLen: Int,
-        private var leaves: Array<Any?>?,
-        private var index: Int,
-        private var jump: Int
+        private var leaves: Array<Any?>?
     ) : Iterator<T> {
+
+        private var index: Int = 0
+        private var jump: Int = B
 
         private val size: Int
             get() = nodesLen + tailLen
