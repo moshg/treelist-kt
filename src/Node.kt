@@ -13,6 +13,9 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
     inline fun add(level: Int, index: Int, e: T) = add(this, level, index, e)
 
     @Suppress("NOTHING_TO_INLINE")
+    inline fun addLeaves(level: Int, index: Int, leaves: Array<Any?>) = addLeaves(this, level, index, leaves)
+
+    @Suppress("NOTHING_TO_INLINE")
     inline fun added(level: Int, index: Int, e: T): Node<T> = added(this, level, index, e)
 
     @Suppress("NOTHING_TO_INLINE")
@@ -133,10 +136,29 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
                 level -= WIDTH
             }
 
-            if (level == 0) {
-                val leaves = currNode.leaves!!
-                leaves[index and MASK] = e
+            val leaves = currNode.leaves!!
+            leaves[index and MASK] = e
+        }
+
+        @JvmStatic
+        fun <T> addLeaves(node: Node<T>, level: Int, index: Int, leaves: Array<Any?>) {
+            var level = level
+            var currNode = node
+
+            while (level > 0) {
+                val arrIndex = (index ushr level) and MASK
+                val nextNodes = currNode.nodes!!
+                val nextNode = nextNodes[arrIndex]
+                if (nextNode === null) {
+                    nextNodes[arrIndex] = createSingleLeaves(level - WIDTH, leaves)
+                    break
+                } else {
+                    currNode = nextNode
+                }
+                level -= WIDTH
             }
+
+            currNode.leaves = leaves
         }
 
         @JvmStatic
