@@ -100,6 +100,12 @@ class TreeList<T> internal constructor(
         }
     }
 
+    fun addedAll(elements: Iterable<T>): TreeList<T> = addedWith {
+        for (e in elements) {
+            add(e)
+        }
+    }
+
     override fun contains(element: T): Boolean {
         if (element === null) {
             for (e in this) {
