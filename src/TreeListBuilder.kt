@@ -30,7 +30,7 @@ class TreeListBuilder<T> internal constructor(
                 this.level += WIDTH
                 this.nodes = arrayOfNulls<Node<T>>(B).also { it[0] = Node(null, tail) }
                 this.nodesLen = B
-            } else if (nodesLen == 1 shl level) {
+            } else if (nodesLen == 1 shl (level + WIDTH)) {
                 // nodesが埋まっている場合
                 this.level += WIDTH
                 val oldRoot = Node(nodes, null)
@@ -46,8 +46,12 @@ class TreeListBuilder<T> internal constructor(
                 val nodesLen = this.nodesLen
                 this.nodesLen = nodesLen + B
                 val index = getIndex(level, nodesLen)
-                nodes[index] = nodes[index]?.addedLeaves(level - WIDTH, nodesLen + tailLen, tail)
-                    ?: createSingleLeaves(level - WIDTH, tail)
+                val node = nodes[index]
+                if (node === null) {
+                    nodes[index] = createSingleLeaves(level - WIDTH, tail)
+                } else {
+                    node.addLeaves(level - WIDTH, nodesLen, tail)
+                }
             }
         }
     }
