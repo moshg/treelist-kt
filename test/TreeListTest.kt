@@ -46,6 +46,21 @@ internal class TreeListTest {
 
         val l = treeListOf(0, 1).set(0, 2)
         assertEquals(2, l[0])
+
+        var l2 = TreeList<Int>()
+        for (i in 0 until B * B * B + 1) {
+            l2 = l2.added(i)
+        }
+        var l3 = l2
+        for (i in 0 until B * B * B + 1) {
+            l3 = l3.set(i, i + 1)
+        }
+        for (i in 0 until B * B * B + 1) {
+            assertEquals(i, l2[i])
+        }
+        for (i in 0 until B * B * B + 1) {
+            assertEquals(i + 1, l3[i])
+        }
     }
 
     @Test
