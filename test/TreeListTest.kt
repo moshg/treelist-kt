@@ -146,23 +146,23 @@ internal class TreeListTest {
     }
 
     @Test
-    fun builder() {
+    fun addedWith() {
         val empty = TreeList<Int>()
-        val l = empty.builder().apply {
+        val l = empty.addedWith {
             for (i in 0 until B * B * B + 1) {
                 add(i + 3)
             }
-        }.build()
+        }
         for (i in 0 until B * B * B + 1) {
             assertEquals(i + 3, l[i])
         }
 
         val tail = TreeList<Int>().added(3).added(4).added(5)
-        val l2 = tail.builder().apply {
+        val l2 = tail.addedWith {
             for (i in 3 until B * B * B + 1) {
                 add(i + 3)
             }
-        }.build()
+        }
         for (i in 0 until B * B * B + 1) {
             assertEquals(i + 3, l2[i])
         }
@@ -171,11 +171,11 @@ internal class TreeListTest {
         for (i in 0 until B * B + 1) {
             fullNodes = fullNodes.added(i + 3)
         }
-        val l3 = fullNodes.builder().apply {
+        val l3 = fullNodes.addedWith {
             for (i in B * B + 1 until B * B * B + 1) {
                 add(i + 3)
             }
-        }.build()
+        }
         for (i in 0 until B * B + 1) {
             assertEquals(i + 3, fullNodes[i])
         }
@@ -188,11 +188,11 @@ internal class TreeListTest {
                 add(i + 3)
             }
         }
-        val l5 = l4.builder().apply {
+        val l5 = l4.addedWith {
             for (i in (B * B - 2) until B * B * B + 1) {
                 add(i + 3)
             }
-        }.build()
+        }
         for (i in 0 until B * B - 2) {
             assertEquals(i + 3, l4[i])
         }

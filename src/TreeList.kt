@@ -362,6 +362,12 @@ class TreeList<T> internal constructor(
         }
     }
 
+    fun addedWith(block: TreeListBuilder<T>.() -> Unit): TreeList<T> {
+        val b = builder()
+        block(b)
+        return b.build()
+    }
+
     companion object {
         @JvmStatic
         private val emptyNodes: Array<Node<*>?> = arrayOfNulls(B)
