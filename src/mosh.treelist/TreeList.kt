@@ -11,9 +11,7 @@ class TreeList<T> internal constructor(
     private val tailLen: Int
 ) : List<T> {
 
-    constructor() : this(0,
-        emptyNodes(), 0,
-        emptyTail(), 0)
+    constructor() : this(0, emptyNodes(), 0, emptyTail(), 0)
 
     override val size: Int
         get() = nodesLen + tailLen
@@ -80,8 +78,8 @@ class TreeList<T> internal constructor(
             val nodes = this.nodes
             if (nodes === emptyNodes<Node<T>?>()) {
                 // nodesが未初期化状態の場合
-                val newNodes = arrayOfNulls<Node<T>>(B).also { it[0] =
-                    Node(null, tail)
+                val newNodes = arrayOfNulls<Node<T>>(B).also {
+                    it[0] = Node(null, tail)
                 }
                 return TreeList(level + WIDTH, newNodes, B, newTail, 1)
             } else if (nodesLen == 1 shl (level + WIDTH)) {
@@ -394,13 +392,11 @@ class TreeList<T> internal constructor(
     }
 
     companion object {
-        @JvmStatic
         private val emptyNodes: Array<Node<*>?> = arrayOfNulls(B)
 
         @Suppress("UNCHECKED_CAST")
         internal fun <T> emptyNodes(): Array<Node<T>?> = emptyNodes as Array<Node<T>?>
 
-        @JvmStatic
         private val emptyTail: Array<Any?> = arrayOfNulls(B)
 
         @Suppress("UNCHECKED_CAST")

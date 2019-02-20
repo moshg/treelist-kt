@@ -60,16 +60,14 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
 
     companion object {
         @Suppress("NOTHING_TO_INLINE")
-        @JvmStatic
+
         inline fun getIndex(level: Int, i: Int): Int = (i ushr level) and MASK
 
-        @JvmStatic
         fun <T> createSingle(level: Int, e: T): Node<T> =
             createSingleLeaves(
                 level,
                 arrayOfNulls<Any?>(B).also { it[0] = e })
 
-        @JvmStatic
         fun <T> createSingleLeaves(level: Int, leaves: Array<Any?>): Node<T> {
             var level = level
             var node = Node<T>(null, leaves)
@@ -82,7 +80,6 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             return node
         }
 
-        @JvmStatic
         tailrec fun <T> get(node: Node<T>, level: Int, index: Int): T {
             return if (level == 0) {
                 @Suppress("UNCHECKED_CAST")
@@ -96,7 +93,6 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             }
         }
 
-        @JvmStatic
         tailrec fun <T> getLeaves(node: Node<T>, level: Int, index: Int): Array<Any?> {
             return if (level == 0) {
                 node.leaves!!
@@ -110,7 +106,6 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             }
         }
 
-        @JvmStatic
         fun <T> set(node: Node<T>, level: Int, index: Int, e: T): Node<T> {
             var level = level
             val retNode = Node<T>(null, null)
@@ -140,7 +135,6 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             return retNode
         }
 
-        @JvmStatic
         fun <T> add(node: Node<T>, level: Int, index: Int, e: T) {
             var level = level
             var currNode = node
@@ -162,7 +156,6 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             leaves[index and MASK] = e
         }
 
-        @JvmStatic
         fun <T> addLeaves(node: Node<T>, level: Int, index: Int, leaves: Array<Any?>) {
             var level = level
             var currNode = node
@@ -184,7 +177,6 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             currNode.leaves = leaves
         }
 
-        @JvmStatic
         fun <T> added(node: Node<T>, level: Int, index: Int, e: T): Node<T> {
             var level = level
             val retNode = Node<T>(null, null)
@@ -222,7 +214,6 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             return retNode
         }
 
-        @JvmStatic
         fun <T> addedLeaves(node: Node<T>, level: Int, index: Int, leaves: Array<Any?>): Node<T> {
             var level = level
             val retNode = Node<T>(null, null)
@@ -259,7 +250,6 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             return retNode
         }
 
-        @JvmStatic
         fun <T> copy(node: Node<T>, level: Int, index: Int): Node<T> {
             var level = level
             val retNode = Node<T>(null, null)
