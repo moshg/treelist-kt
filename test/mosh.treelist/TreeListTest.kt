@@ -1,13 +1,11 @@
 package mosh.treelist
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import kotlin.test.*
 
 internal class TreeListTest {
     @Test
     fun get() {
-        assertThrows<IndexOutOfBoundsException> { TreeList<Int>()[0] }
+        assertFailsWith<IndexOutOfBoundsException> { TreeList<Int>()[0] }
     }
 
     @Test
@@ -44,7 +42,7 @@ internal class TreeListTest {
 
     @Test
     fun set() {
-        assertThrows<IndexOutOfBoundsException> { TreeList<Int>().set(0, 0) }
+        assertFailsWith<IndexOutOfBoundsException> { TreeList<Int>().set(0, 0) }
 
         val l = treeListOf(0, 1).set(0, 2)
         assertEquals(2, l[0])
@@ -67,20 +65,20 @@ internal class TreeListTest {
 
     @Test
     fun contains() {
-        assert(!TreeList<Int>().contains(0))
+        assertFalse(TreeList<Int>().contains(0))
 
         val l = treeListOf(10, 20, 30)
-        assert(l.contains(20))
-        assert(!l.contains(50))
+        assertTrue(l.contains(20))
+        assertFalse(l.contains(50))
     }
 
     @Test
     fun containsAll() {
-        assert(TreeList<Int>().containsAll(ArrayList()))
+        assertTrue(TreeList<Int>().containsAll(ArrayList()))
 
         val l = treeListOf(10, 20, 30)
-        assert(l.containsAll(arrayListOf(20, 30)))
-        assert(!l.containsAll(arrayListOf(30, 40)))
+        assertTrue(l.containsAll(arrayListOf(20, 30)))
+        assertFalse(l.containsAll(arrayListOf(30, 40)))
     }
 
     @Test
@@ -101,7 +99,7 @@ internal class TreeListTest {
     operator fun iterator() {
         val emptyIter = treeListOf<Int>().iterator()
         assertEquals(false, emptyIter.hasNext())
-        assertThrows<NoSuchElementException> { emptyIter.next() }
+        assertFailsWith<NoSuchElementException> { emptyIter.next() }
 
         var l = treeListOf<Int>()
         for (i in 0 until B * B * B + 1) {
@@ -113,7 +111,7 @@ internal class TreeListTest {
             assertEquals(i + 3, e)
             i += 1
         }
-        assertThrows<NoSuchElementException> { iter.next() }
+        assertFailsWith<NoSuchElementException> { iter.next() }
     }
 
     @Test
@@ -121,8 +119,8 @@ internal class TreeListTest {
         val emptyIter = treeListOf<Int>().listIterator()
         assertEquals(false, emptyIter.hasNext())
         assertEquals(false, emptyIter.hasPrevious())
-        assertThrows<NoSuchElementException> { emptyIter.next() }
-        assertThrows<NoSuchElementException> { emptyIter.previous() }
+        assertFailsWith<NoSuchElementException> { emptyIter.next() }
+        assertFailsWith<NoSuchElementException> { emptyIter.previous() }
 
         var l = treeListOf<Int>()
         for (i in 0 until B * B * B + 1) {
@@ -135,7 +133,7 @@ internal class TreeListTest {
             assertEquals(i + 3, iter.next())
             i += 1
         }
-        assertThrows<NoSuchElementException> { iter.next() }
+        assertFailsWith<NoSuchElementException> { iter.next() }
 
         i = B * B * B + 1 - 1
         val iterRev = l.listIterator(l.size)
@@ -144,7 +142,7 @@ internal class TreeListTest {
             assertEquals(i + 3, iterRev.previous())
             i -= 1
         }
-        assertThrows<NoSuchElementException> { iterRev.previous() }
+        assertFailsWith<NoSuchElementException> { iterRev.previous() }
     }
 
     @Test
@@ -198,7 +196,7 @@ internal class TreeListTest {
         for (i in 0 until B * B - 2) {
             assertEquals(i + 3, l4[i])
         }
-        assertThrows<IndexOutOfBoundsException> { l4[B * B - 2] }
+        assertFailsWith<IndexOutOfBoundsException> { l4[B * B - 2] }
         for (i in 0 until B * B * B + 1) {
             assertEquals(i + 3, l5[i])
         }

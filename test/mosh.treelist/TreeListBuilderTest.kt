@@ -1,15 +1,15 @@
 package mosh.treelist
 
-import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 internal class TreeListBuilderTest {
     @Test
     fun build() {
         val b = TreeListBuilder<Int>()
 
-        assert(b.build().isEmpty())
+        assertTrue(b.build().isEmpty())
 
         b.add(2)
         b.add(3)
