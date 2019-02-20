@@ -1,5 +1,7 @@
-import Node.Companion.createSingleLeaves
-import Node.Companion.getIndex
+package mosh.treelist
+
+import mosh.treelist.Node.Companion.createSingleLeaves
+import mosh.treelist.Node.Companion.getIndex
 
 class TreeList<T> internal constructor(
     private val level: Int,
@@ -9,7 +11,9 @@ class TreeList<T> internal constructor(
     private val tailLen: Int
 ) : List<T> {
 
-    constructor() : this(0, emptyNodes(), 0, emptyTail(), 0)
+    constructor() : this(0,
+        emptyNodes(), 0,
+        emptyTail(), 0)
 
     override val size: Int
         get() = nodesLen + tailLen
@@ -76,7 +80,9 @@ class TreeList<T> internal constructor(
             val nodes = this.nodes
             if (nodes === emptyNodes<Node<T>?>()) {
                 // nodesが未初期化状態の場合
-                val newNodes = arrayOfNulls<Node<T>>(B).also { it[0] = Node(null, tail) }
+                val newNodes = arrayOfNulls<Node<T>>(B).also { it[0] =
+                    Node(null, tail)
+                }
                 return TreeList(level + WIDTH, newNodes, B, newTail, 1)
             } else if (nodesLen == 1 shl (level + WIDTH)) {
                 // nodesが埋まっている場合
@@ -86,7 +92,13 @@ class TreeList<T> internal constructor(
                     it[0] = oldRoot
                     it[1] = second
                 }
-                return TreeList(level + WIDTH, newNodes, nodesLen + B, newTail, 1)
+                return TreeList(
+                    level + WIDTH,
+                    newNodes,
+                    nodesLen + B,
+                    newTail,
+                    1
+                )
             } else {
                 // nodesに空きがある場合
                 val level = this.level
@@ -188,11 +200,18 @@ class TreeList<T> internal constructor(
             leaves = focus[0]!![0]!!.leaves
         }
         @Suppress("UNCHECKED_CAST")
-        return Iter(focus as Array<Array<Node<T>?>>, nodesLen, tail, tailLen, leaves)
+        return Iter(
+            focus as Array<Array<Node<T>?>>,
+            nodesLen,
+            tail,
+            tailLen,
+            leaves
+        )
     }
 
 
-    override fun listIterator(): ListIter<T> = ListIter(level, nodes, nodesLen, tail, tailLen, null, 0)
+    override fun listIterator(): ListIter<T> =
+        ListIter(level, nodes, nodesLen, tail, tailLen, null, 0)
 
     override fun listIterator(index: Int): ListIterator<T> {
         if (index < nodesLen) {

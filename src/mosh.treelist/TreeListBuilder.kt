@@ -1,6 +1,8 @@
-import Node.Companion.createSingleLeaves
-import Node.Companion.getIndex
-import TreeList.Companion.emptyNodes
+package mosh.treelist
+
+import mosh.treelist.Node.Companion.createSingleLeaves
+import mosh.treelist.Node.Companion.getIndex
+import mosh.treelist.TreeList.Companion.emptyNodes
 
 class TreeListBuilder<T> internal constructor(
     private var level: Int,
@@ -28,7 +30,9 @@ class TreeListBuilder<T> internal constructor(
             if (nodes === null) {
                 // nodesが未初期化状態の場合
                 this.level += WIDTH
-                this.nodes = arrayOfNulls<Node<T>>(B).also { it[0] = Node(null, tail) }
+                this.nodes = arrayOfNulls<Node<T>>(B).also { it[0] =
+                    Node(null, tail)
+                }
                 this.nodesLen = B
             } else if (nodesLen == 1 shl (level + WIDTH)) {
                 // nodesが埋まっている場合

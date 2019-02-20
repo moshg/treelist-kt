@@ -1,28 +1,36 @@
+package mosh.treelist
+
 @Suppress("NAME_SHADOWING")
 internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
     @Suppress("NOTHING_TO_INLINE")
     inline fun get(level: Int, index: Int): T = get(this, level, index)
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun getLeaves(level: Int, index: Int): Array<Any?> = getLeaves(this, level, index)
+    inline fun getLeaves(level: Int, index: Int): Array<Any?> =
+        getLeaves(this, level, index)
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun set(level: Int, index: Int, e: T): Node<T> = set(this, level, index, e)
+    inline fun set(level: Int, index: Int, e: T): Node<T> =
+        set(this, level, index, e)
 
     @Suppress("NOTHING_TO_INLINE")
     inline fun add(level: Int, index: Int, e: T) = add(this, level, index, e)
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun addLeaves(level: Int, index: Int, leaves: Array<Any?>) = addLeaves(this, level, index, leaves)
+    inline fun addLeaves(level: Int, index: Int, leaves: Array<Any?>) =
+        addLeaves(this, level, index, leaves)
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun added(level: Int, index: Int, e: T): Node<T> = added(this, level, index, e)
+    inline fun added(level: Int, index: Int, e: T): Node<T> =
+        added(this, level, index, e)
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun addedLeaves(level: Int, index: Int, leaves: Array<Any?>) = addedLeaves(this, level, index, leaves)
+    inline fun addedLeaves(level: Int, index: Int, leaves: Array<Any?>) =
+        addedLeaves(this, level, index, leaves)
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun copy(level: Int, index: Int): Node<T> = copy(this, level, index)
+    inline fun copy(level: Int, index: Int): Node<T> =
+        copy(this, level, index)
 
     override fun toString(): String = buildString(B * 3) {
         if (leaves === null) {
@@ -57,7 +65,9 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
 
         @JvmStatic
         fun <T> createSingle(level: Int, e: T): Node<T> =
-            createSingleLeaves(level, arrayOfNulls<Any?>(B).also { it[0] = e })
+            createSingleLeaves(
+                level,
+                arrayOfNulls<Any?>(B).also { it[0] = e })
 
         @JvmStatic
         fun <T> createSingleLeaves(level: Int, leaves: Array<Any?>): Node<T> {
@@ -78,7 +88,11 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
                 @Suppress("UNCHECKED_CAST")
                 node.leaves!![index and MASK] as T
             } else {
-                get(node.nodes!![getIndex(level, index)]!!, level - WIDTH, index)
+                get(
+                    node.nodes!![getIndex(level, index)]!!,
+                    level - WIDTH,
+                    index
+                )
             }
         }
 
@@ -87,7 +101,12 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
             return if (level == 0) {
                 node.leaves!!
             } else {
-                getLeaves(node.nodes!![getIndex(level, index)]!!, level - WIDTH, index)
+                getLeaves(
+                    node.nodes!![getIndex(
+                        level,
+                        index
+                    )]!!, level - WIDTH, index
+                )
             }
         }
 
@@ -153,7 +172,8 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
                 val nextNodes = currNode.nodes!!
                 val nextNode = nextNodes[arrIndex]
                 if (nextNode === null) {
-                    nextNodes[arrIndex] = createSingleLeaves(level - WIDTH, leaves)
+                    nextNodes[arrIndex] =
+                        createSingleLeaves(level - WIDTH, leaves)
                     break
                 } else {
                     currNode = nextNode
@@ -216,7 +236,8 @@ internal class Node<T>(var nodes: Array<Node<T>?>?, var leaves: Array<Any?>?) {
                 val arrIndex = (index ushr level) and MASK
                 val child = currNewNodes[arrIndex]
                 if (child === null) {
-                    currNewNodes[arrIndex] = createSingleLeaves(level - WIDTH, leaves)
+                    currNewNodes[arrIndex] =
+                        createSingleLeaves(level - WIDTH, leaves)
                     currNewNode.nodes = currNewNodes
                     break
                 } else {
