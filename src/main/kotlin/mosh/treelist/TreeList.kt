@@ -185,38 +185,34 @@ class TreeList<T> internal constructor(
         }
     }
 
-    override fun iterator(): Iter<T> {
-        val focus = arrayOfNulls<Array<Node<T>?>>(level / WIDTH)
-        val leaves: Array<Any?>?
-        if (nodes[0] === null) {
-            leaves = tail
-        } else {
-            focus[focus.size - 1] = nodes
-            for (i in (focus.size - 1) downTo 1) {
-                focus[i - 1] = focus[i]!![0]!!.nodes
-            }
-            leaves = focus[0]!![0]!!.leaves
-        }
-        @Suppress("UNCHECKED_CAST")
-        return Iter(
-            focus as Array<Array<Node<T>?>>,
-            nodesLen,
-            tail,
-            tailLen,
-            leaves
-        )
-    }
+    override fun iterator(): Iter<T> =
+        Iter(this)
 
-    class Iter<T> internal constructor(
-        private val focus: Array<Array<Node<T>?>>,
-        private val nodesLen: Int,
-        private val tail: Array<Any?>,
-        private val tailLen: Int,
-        private var leaves: Array<Any?>?
-    ) : Iterator<T> {
+    class Iter<T> internal constructor(list: TreeList<T>) : Iterator<T> {
 
         private var index: Int = 0
         private var jump: Int = B
+        private val focus: Array<Array<Node<T>?>>
+        private var leaves: Array<Any?>?
+        private val nodesLen: Int = list.nodesLen
+        private val tail: Array<Any?> = list.tail
+        private val tailLen: Int = list.tailLen
+
+
+        init {
+            val focus = arrayOfNulls<Array<Node<T>?>>(list.level / WIDTH)
+            if (list.nodes[0] === null) {
+                leaves = list.tail
+            } else {
+                focus[focus.size - 1] = list.nodes
+                for (i in (focus.size - 1) downTo 1) {
+                    focus[i - 1] = focus[i]!![0]!!.nodes
+                }
+                leaves = focus[0]!![0]!!.leaves
+            }
+            @Suppress("UNCHECKED_CAST")
+            this.focus = focus as Array<Array<Node<T>?>>
+        }
 
         private val size: Int
             get() = nodesLen + tailLen
@@ -239,6 +235,7 @@ class TreeList<T> internal constructor(
                 this.index = index + 1
                 return leaves!![index and MASK] as T
             }
+
             jump += B
             val diff = index xor (index - 1)
             var level = WIDTH * 2
