@@ -366,6 +366,7 @@ class TreeList<T> internal constructor(
         }
     }
 
+    // OPTIMIZE: Use Indexer.
     class ListIter<T> internal constructor(
         private val level: Int,
         private val nodes: Array<Node<T>?>,
