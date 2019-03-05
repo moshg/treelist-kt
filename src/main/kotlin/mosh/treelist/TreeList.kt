@@ -284,6 +284,9 @@ class TreeList<T> internal constructor(
             this.focus = focus as Array<Array<Node<T>?>>
         }
 
+        internal val size: Int
+            get() = nodesLen + tailLen
+
         @Suppress("UNCHECKED_CAST")
         operator fun get(index: Int): T {
             if (index < 0) {
@@ -339,70 +342,35 @@ class TreeList<T> internal constructor(
     }
 
     override fun listIterator(): ListIter<T> =
-        ListIter(level, nodes, nodesLen, tail, tailLen, null, 0)
+        ListIter(this, 0)
 
     override fun listIterator(index: Int): ListIterator<T> {
-        if (index < nodesLen) {
-            if (index < 0) {
-                throw indexUnderflowException(index)
-            }
-            return ListIter(
-                level,
-                nodes,
-                nodesLen,
-                tail,
-                tailLen,
-                nodes[getIndex(level, index)]!!.getLeaves(level - WIDTH, index),
-                index
-            )
-        } else {
-            if (index > size) {
-                throw indexOverflowException(index)
-            }
-            return ListIter(level, nodes, nodesLen, tail, tailLen, null, index)
+        if (index < 0) {
+            throw indexUnderflowException(index)
+        } else if (index > size) {
+            throw indexOverflowException(index)
         }
+
+        return ListIter(this, index)
     }
 
-    // OPTIMIZE: Use Indexer.
-    class ListIter<T> internal constructor(
-        private val level: Int,
-        private val nodes: Array<Node<T>?>,
-        private val nodesLen: Int,
-        private val tail: Array<Any?>,
-        private val tailLen: Int,
-        private var leaves: Array<Any?>?,
-        private var index: Int
-    ) : ListIterator<T> {
+    class ListIter<T> internal constructor(list: TreeList<T>, private var index: Int) : ListIterator<T> {
+        private val indexer: Indexer<T> = list.indexer()
 
-        private val size: Int
-            get() = nodesLen + tailLen
-
-        override fun hasNext(): Boolean = index < size
+        override fun hasNext(): Boolean = index < indexer.size
 
         override fun nextIndex(): Int = index
 
         override fun next(): T {
             val index = this.index
-            if (index < nodesLen) {
-                this.index = index + 1
-                val leafIndex = index and MASK
-                if (leafIndex == 0) {
-                    leaves = nodes[getIndex(level, index)]!!.getLeaves(level - WIDTH, index)
-                    @Suppress("UNCHECKED_CAST")
-                    return leaves!![0] as T
-                } else {
-                    @Suppress("UNCHECKED_CAST")
-                    return leaves!![leafIndex] as T
-                }
-            } else {
-                val tailIndex = index - nodesLen
-                if (tailIndex >= tailLen) {
-                    throw NoSuchElementException("Index $index out of bounds for length $size")
-                }
-                this.index = index + 1
-                @Suppress("UNCHECKED_CAST")
-                return tail[tailIndex] as T
+            val ret = try {
+                indexer[index]
+            } catch (e: IndexOutOfBoundsException) {
+                throw NoSuchElementException("Index $index out of bounds for length ${indexer.size}")
             }
+
+            this.index = index + 1
+            return ret
         }
 
         override fun hasPrevious(): Boolean = index > 0
@@ -411,27 +379,14 @@ class TreeList<T> internal constructor(
 
         override fun previous(): T {
             val index = this.index - 1
-            if (index < nodesLen) {
-                if (index < 0) {
-                    throw NoSuchElementException("Index $index out of bounds")
-                }
-                this.index = index
-                val leafIndex = index and MASK
-                if (leafIndex == MASK) {
-                    val leaves = nodes[getIndex(level, index)]!!.getLeaves(level - WIDTH, index)
-                    this.leaves = leaves
-                    @Suppress("UNCHECKED_CAST")
-                    return leaves[leaves.size - 1] as T
-                } else {
-                    @Suppress("UNCHECKED_CAST")
-                    return leaves!![leafIndex] as T
-                }
-            } else {
-                this.index = index
-                val tailIndex = index - nodesLen
-                @Suppress("UNCHECKED_CAST")
-                return tail[tailIndex] as T
+            val ret = try {
+                indexer[index]
+            } catch (e: IndexOutOfBoundsException) {
+                throw NoSuchElementException("Index $index out of bounds")
             }
+
+            this.index = index
+            return ret
         }
     }
 
