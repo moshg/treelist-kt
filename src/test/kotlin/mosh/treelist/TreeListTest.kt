@@ -115,6 +115,26 @@ internal class TreeListTest {
     }
 
     @Test
+    fun indexer() {
+        val empty = emptyTreeList<Int>()
+        assertFailsWith<IndexOutOfBoundsException> { empty.indexer()[0] }
+
+        var l = treeListOf<Int>()
+        for (i in 0 until B * B * B + 1) {
+            l = l.added(i + 3)
+        }
+        val indexer = l.indexer()
+        assertFailsWith<IndexOutOfBoundsException> { indexer[-1] }
+        assertFailsWith<IndexOutOfBoundsException> { indexer[B * B * B + 1] }
+        for (i in 0 until B * B * B + 1) {
+            assertEquals(i + 3, indexer[i])
+        }
+        for (i in 0 until B * B * B + 1 step B * B) {
+            assertEquals(i + 3, indexer[i])
+        }
+    }
+
+    @Test
     fun listIterator() {
         val emptyIter = treeListOf<Int>().listIterator()
         assertEquals(false, emptyIter.hasNext())

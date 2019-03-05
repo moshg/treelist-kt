@@ -207,32 +207,6 @@ class TreeList<T> internal constructor(
         )
     }
 
-
-    override fun listIterator(): ListIter<T> =
-        ListIter(level, nodes, nodesLen, tail, tailLen, null, 0)
-
-    override fun listIterator(index: Int): ListIterator<T> {
-        if (index < nodesLen) {
-            if (index < 0) {
-                throw indexUnderflowException(index)
-            }
-            return ListIter(
-                level,
-                nodes,
-                nodesLen,
-                tail,
-                tailLen,
-                nodes[getIndex(level, index)]!!.getLeaves(level - WIDTH, index),
-                index
-            )
-        } else {
-            if (index > size) {
-                throw indexOverflowException(index)
-            }
-            return ListIter(level, nodes, nodesLen, tail, tailLen, null, index)
-        }
-    }
-
     class Iter<T> internal constructor(
         private val focus: Array<Array<Node<T>?>>,
         private val nodesLen: Int,
@@ -285,6 +259,110 @@ class TreeList<T> internal constructor(
 
             this.index = index + 1
             return leaves!![index and MASK] as T
+        }
+    }
+
+    fun indexer(): Indexer<T> = Indexer(this)
+
+    class Indexer<T> internal constructor(list: TreeList<T>) {
+        private val focus: Array<Array<Node<T>?>>
+        private var leaves: Array<Any?>?
+        private var prevIndex: Int = 0
+        private val nodesLen: Int = list.nodesLen
+        private val tail: Array<Any?> = list.tail
+        private val tailLen: Int = list.tailLen
+
+        init {
+            val focus = arrayOfNulls<Array<Node<T>?>>(list.level / WIDTH)
+            if (list.nodes[0] === null) {
+                this.leaves = list.tail
+            } else {
+                focus[focus.size - 1] = list.nodes
+                for (i in (focus.size - 1) downTo 1) {
+                    focus[i - 1] = focus[i]!![0]!!.nodes
+                }
+                this.leaves = focus[0]!![0]!!.leaves
+            }
+            @Suppress("UNCHECKED_CAST")
+            this.focus = focus as Array<Array<Node<T>?>>
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        operator fun get(index: Int): T {
+            if (index < 0) {
+                throw IndexOutOfBoundsException("Index $index out of bounds")
+            }
+
+            if (index >= nodesLen) {
+                if (index >= nodesLen + tailLen) {
+                    throw IndexOutOfBoundsException("Index $index out of bounds for size ${nodesLen + tailLen}")
+                } else {
+                    this.prevIndex = index
+                    return tail[index and MASK] as T
+                }
+            }
+
+            var focusIndex: Int
+            var level: Int
+            if (prevIndex >= nodesLen) {
+                focusIndex = focus.size - 1
+                level = focus.size * WIDTH
+            } else {
+                val diff = index xor (prevIndex)
+                if (diff and MASK.inv() == 0) {
+                    prevIndex = index
+                    return leaves!![index and MASK] as T
+                }
+
+                level = WIDTH * 2
+                focusIndex = 0
+                while ((diff ushr level) != 0) {
+                    level += WIDTH
+                    focusIndex += 1
+                    if (level >= Int.SIZE_BITS) {
+                        level -= WIDTH
+                        focusIndex -= 1
+                        break
+                    }
+                }
+                level -= WIDTH
+            }
+
+            while (focusIndex > 0) {
+                focus[focusIndex - 1] = focus[focusIndex][getIndex(level, index)]!!.nodes!!
+                level -= WIDTH
+                focusIndex -= 1
+            }
+
+            leaves = focus[0][getIndex(WIDTH, index)]!!.leaves
+
+            this.prevIndex = index
+            return leaves!![index and MASK] as T
+        }
+    }
+
+    override fun listIterator(): ListIter<T> =
+        ListIter(level, nodes, nodesLen, tail, tailLen, null, 0)
+
+    override fun listIterator(index: Int): ListIterator<T> {
+        if (index < nodesLen) {
+            if (index < 0) {
+                throw indexUnderflowException(index)
+            }
+            return ListIter(
+                level,
+                nodes,
+                nodesLen,
+                tail,
+                tailLen,
+                nodes[getIndex(level, index)]!!.getLeaves(level - WIDTH, index),
+                index
+            )
+        } else {
+            if (index > size) {
+                throw indexOverflowException(index)
+            }
+            return ListIter(level, nodes, nodesLen, tail, tailLen, null, index)
         }
     }
 
