@@ -228,7 +228,7 @@ class TreeList<T> internal constructor(
             val index = this.index
             if (index >= nodesLen) {
                 if (index >= nodesLen + tailLen) {
-                    throw NoSuchElementException("Index $index out of bounds for size ${nodesLen + tailLen}")
+                    throw NoSuchElementException("Index $index out of bounds for length ${nodesLen + tailLen}")
                 } else {
                     this.index = index + 1
                     return tail[index and MASK] as T
@@ -295,7 +295,7 @@ class TreeList<T> internal constructor(
 
             if (index >= nodesLen) {
                 if (index >= nodesLen + tailLen) {
-                    throw IndexOutOfBoundsException("Index $index out of bounds for size ${nodesLen + tailLen}")
+                    throw IndexOutOfBoundsException("Index $index out of bounds for length ${nodesLen + tailLen}")
                 } else {
                     this.prevIndex = index
                     return tail[index and MASK] as T
@@ -400,7 +400,7 @@ class TreeList<T> internal constructor(
             } else {
                 val tailIndex = index - nodesLen
                 if (tailIndex >= tailLen) {
-                    throw NoSuchElementException("Index $index out of bounds for size $size")
+                    throw NoSuchElementException("Index $index out of bounds for length $size")
                 }
                 this.index = index + 1
                 @Suppress("UNCHECKED_CAST")
